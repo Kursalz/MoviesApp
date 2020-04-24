@@ -19,37 +19,15 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/movie_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/layout_margin_left"
-                android:text="@string/movie_name"
-                android:textAlignment="center"
-                android:layout_marginTop="10dp"
-                android:textStyle="bold"
-                android:textSize="25sp"/>
-
-            <TextView
                 android:id="@+id/title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/layout_margin_left"
                 android:layout_marginTop="@dimen/layout_margin_top"
                 android:padding="@dimen/layout_padding"
-                android:textAlignment="center"
-                android:textSize="20sp" />
-
-            <TextView
-                android:id="@+id/plot_synopsis"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/layout_margin_left"
-                android:padding="@dimen/layout_padding"
-                android:text="@string/movie_plot"
-                android:textAlignment="center"
-                android:layout_marginTop="@dimen/layout_margin_top"
-                android:textStyle="bold"
-                android:textSize="25sp"/>
+                android:textAlignment="gravity"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textSize="24sp" />
 
             <TextView
                 android:id="@+id/plotsynopsis"
@@ -58,7 +36,7 @@
                 android:layout_marginStart="@dimen/layout_margin_left"
                 android:layout_marginTop="@dimen/layout_margin_top"
                 android:padding="@dimen/layout_padding"
-                android:textAlignment="center"
+                android:textAlignment="gravity"
                 android:textSize="20sp" />
 
 
@@ -69,7 +47,7 @@
                 android:layout_marginStart="@dimen/layout_margin_left"
                 android:padding="@dimen/layout_padding"
                 android:text="@string/rating"
-                android:textAlignment="center"
+                android:textAlignment="gravity"
                 android:layout_marginTop="@dimen/layout_margin_top"
                 android:textStyle="bold"
                 android:textSize="25sp"/>
@@ -81,7 +59,7 @@
                 android:layout_marginStart="@dimen/layout_margin_left"
                 android:layout_marginTop="@dimen/layout_margin_top"
                 android:padding="@dimen/layout_padding"
-                android:textAlignment="center"
+                android:textAlignment="gravity"
                 android:textSize="20sp" />
 
 
@@ -92,7 +70,7 @@
                 android:layout_marginStart="@dimen/layout_margin_left"
                 android:padding="@dimen/layout_padding"
                 android:text="@string/release"
-                android:textAlignment="center"
+                android:textAlignment="gravity"
                 android:layout_marginTop="@dimen/layout_margin_top"
                 android:textStyle="bold"
                 android:textSize="25sp"/>
@@ -104,7 +82,7 @@
                 android:layout_marginStart="@dimen/layout_margin_left"
                 android:layout_marginTop="@dimen/layout_margin_top"
                 android:padding="@dimen/layout_padding"
-                android:textAlignment="center"
+                android:textAlignment="gravity"
                 android:textSize="20sp" />
         </LinearLayout>
     </ScrollView>

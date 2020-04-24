@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.ImageView;
@@ -42,7 +41,7 @@ public class DetailActivity extends AppCompatActivity {
 
         Intent vStartingIntent = getIntent();
         if(vStartingIntent.hasExtra(MyViewHolder.ORIGINAL_TITLE)) {
-            String thumbnail = vStartingIntent.getExtras().getString(MyViewHolder.POSTER_PATH);
+            String thumbnail = vStartingIntent.getExtras().getString(MyViewHolder.BACKDROP_PATH);
             String movieName = vStartingIntent.getExtras().getString(MyViewHolder.ORIGINAL_TITLE);
             String synopsis = vStartingIntent.getExtras().getString(MyViewHolder.OVERVIEW);
             String rating = vStartingIntent.getExtras().getString(MyViewHolder.VOTE_AVERAGE);

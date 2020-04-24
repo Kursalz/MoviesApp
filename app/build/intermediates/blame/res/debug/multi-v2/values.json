@@ -1,25 +1,8 @@
 {
     "logs": [
         {
-            "outputFile": "C:\\Users\\matte\\Desktop\\ProjectWork Film\\MoviesApp\\MoviesApp\\app\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values\\values.xml",
+            "outputFile": "C:\\Users\\matte\\OneDrive\\Desktop\\repo\\MoviesApp\\app\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values\\values.xml",
             "map": [
-                {
-                    "source": "C:\\Users\\matte\\Desktop\\ProjectWork Film\\MoviesApp\\MoviesApp\\app\\src\\main\\res\\values\\strings.xml",
-                    "from": {
-                        "startLines": "4,2,3,1,6,5,7,13,12,11,10,8,9",
-                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4",
-                        "startOffsets": "403,70,140,17,509,457,566,899,839,780,718,620,668",
-                        "endColumns": "52,68,261,51,55,50,52,60,58,57,60,46,48",
-                        "endOffsets": "451,134,397,64,560,503,614,955,893,833,774,662,712"
-                    },
-                    "to": {
-                        "startLines": "799,800,801,802,816,817,818,858,859,860,861,862,863",
-                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4",
-                        "startOffsets": "48787,48840,48909,49171,50706,50762,50813,57839,57900,57959,58017,58078,58125",
-                        "endColumns": "52,68,261,51,55,50,52,60,58,57,60,46,48",
-                        "endOffsets": "48835,48904,49166,49218,50757,50808,50861,57895,57954,58012,58073,58120,58169"
-                    }
-                },
                 {
                     "source": "C:\\Users\\matte\\.gradle\\caches\\transforms-2\\files-2.1\\a627ba2b0fb7cab1458068884dcfd7e5\\jetified-appcompat-resources-1.1.0\\res\\values\\values.xml",
                     "from": {
@@ -116,20 +99,20 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\matte\\Desktop\\ProjectWork Film\\MoviesApp\\MoviesApp\\app\\src\\main\\res\\values\\dimens.xml",
+                    "source": "C:\\Users\\matte\\OneDrive\\Desktop\\repo\\MoviesApp\\app\\src\\main\\res\\values\\strings.xml",
                     "from": {
-                        "startLines": "2,3,8,7,11,12,13,14,15,6,5,4,10,9",
-                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4",
-                        "startOffsets": "57,116,370,321,515,571,622,671,722,269,225,173,471,413",
-                        "endColumns": "57,55,41,47,54,49,47,49,45,50,42,50,42,56",
-                        "endOffsets": "110,167,407,364,565,616,665,716,763,315,263,219,509,465"
+                        "startLines": "4,2,3,1,6,5,7,13,12,11,10,8,9",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "403,70,140,17,509,457,566,899,839,780,718,620,668",
+                        "endColumns": "52,68,261,51,55,50,52,60,58,57,60,46,48",
+                        "endOffsets": "451,134,397,64,560,503,614,955,893,833,774,662,712"
                     },
                     "to": {
-                        "startLines": "408,409,411,412,470,486,487,488,489,495,496,497,667,668",
-                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4",
-                        "startOffsets": "24047,24105,24226,24268,27984,29209,29259,29307,29357,29798,29849,29892,40945,40988",
-                        "endColumns": "57,55,41,47,54,49,47,49,45,50,42,50,42,56",
-                        "endOffsets": "24100,24156,24263,24311,28034,29254,29302,29352,29398,29844,29887,29938,40983,41040"
+                        "startLines": "799,800,801,802,816,817,818,858,859,860,861,862,863",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "48787,48840,48909,49171,50706,50762,50813,57839,57900,57959,58017,58078,58125",
+                        "endColumns": "52,68,261,51,55,50,52,60,58,57,60,46,48",
+                        "endOffsets": "48835,48904,49166,49218,50757,50808,50861,57895,57954,58012,58073,58120,58169"
                     }
                 },
                 {
@@ -149,6 +132,25 @@
                         "endLines": "181,473,474,475,483,484,485,712,6408",
                         "endColumns": "55,58,47,55,74,75,71,65,24",
                         "endOffsets": "9005,28266,28314,28370,29056,29132,29204,43613,406935"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\matte\\OneDrive\\Desktop\\repo\\MoviesApp\\app\\src\\main\\res\\values\\styles.xml",
+                    "from": {
+                        "startLines": "3,15,10,16",
+                        "startColumns": "4,4,4,4",
+                        "startOffsets": "57,540,384,631",
+                        "endLines": "8,15,13,16",
+                        "endColumns": "12,89,12,74",
+                        "endOffsets": "376,625,532,701"
+                    },
+                    "to": {
+                        "startLines": "879,885,886,890",
+                        "startColumns": "4,4,4,4",
+                        "startOffsets": "59302,59621,59711,59861",
+                        "endLines": "884,885,889,890",
+                        "endColumns": "12,89,12,74",
+                        "endOffsets": "59616,59706,59856,59931"
                     }
                 },
                 {
@@ -190,6 +192,23 @@
                     }
                 },
                 {
+                    "source": "C:\\Users\\matte\\OneDrive\\Desktop\\repo\\MoviesApp\\app\\src\\main\\res\\values\\dimens.xml",
+                    "from": {
+                        "startLines": "2,3,8,7,11,12,13,14,15,6,5,4,10,9",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "57,116,370,321,515,571,622,671,722,269,225,173,471,413",
+                        "endColumns": "57,55,41,47,54,49,47,49,45,50,42,50,42,56",
+                        "endOffsets": "110,167,407,364,565,616,665,716,763,315,263,219,509,465"
+                    },
+                    "to": {
+                        "startLines": "408,409,411,412,470,486,487,488,489,495,496,497,667,668",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "24047,24105,24226,24268,27984,29209,29259,29307,29357,29798,29849,29892,40945,40988",
+                        "endColumns": "57,55,41,47,54,49,47,49,45,50,42,50,42,56",
+                        "endOffsets": "24100,24156,24263,24311,28034,29254,29302,29352,29398,29844,29887,29938,40983,41040"
+                    }
+                },
+                {
                     "source": "C:\\Users\\matte\\.gradle\\caches\\transforms-2\\files-2.1\\95e8d6401b4c9ba9dc0f8d4da1cee10d\\jetified-glide-4.11.0\\res\\values\\values.xml",
                     "from": {
                         "startLines": "2",
@@ -204,25 +223,6 @@
                         "startOffsets": "43460",
                         "endColumns": "57",
                         "endOffsets": "43513"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\matte\\Desktop\\ProjectWork Film\\MoviesApp\\MoviesApp\\app\\src\\main\\res\\values\\styles.xml",
-                    "from": {
-                        "startLines": "3,15,10,16",
-                        "startColumns": "4,4,4,4",
-                        "startOffsets": "57,540,384,631",
-                        "endLines": "8,15,13,16",
-                        "endColumns": "12,89,12,74",
-                        "endOffsets": "376,625,532,701"
-                    },
-                    "to": {
-                        "startLines": "879,885,886,890",
-                        "startColumns": "4,4,4,4",
-                        "startOffsets": "59302,59621,59711,59861",
-                        "endLines": "884,885,889,890",
-                        "endColumns": "12,89,12,74",
-                        "endOffsets": "59616,59706,59856,59931"
                     }
                 },
                 {
@@ -262,7 +262,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\matte\\Desktop\\ProjectWork Film\\MoviesApp\\MoviesApp\\app\\src\\main\\res\\values\\colors.xml",
+                    "source": "C:\\Users\\matte\\OneDrive\\Desktop\\repo\\MoviesApp\\app\\src\\main\\res\\values\\colors.xml",
                     "from": {
                         "startLines": "4,2,3,6,5,7",
                         "startColumns": "4,4,4,4,4,4",

@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -23,13 +24,14 @@ public class DetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
-        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         initCollapsingToolbar();
 
         mImageView = findViewById(R.id.thumbnail_image_header);
-        mTxtMovieName = findViewById(R.id.movie_title);
+        mTxtMovieName = findViewById(R.id.title);
         mTxtSynopsis = findViewById(R.id.plotsynopsis);
         mTxtUserRating = findViewById(R.id.userrating);
         mTxtReleaseDate = findViewById(R.id.releasedate);

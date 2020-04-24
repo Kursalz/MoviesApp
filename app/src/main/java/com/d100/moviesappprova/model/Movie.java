@@ -19,7 +19,7 @@ public class Movie {
     private boolean video;
     private Double vote_average;
 
-    private String mBaseImageUrl = "http://image.tmdb.org/t/p/w500";
+    private final String mBaseImageUrl= "https://image.tmdb.org/t/p/w500";
 
     public Movie(String poster_path, boolean adult, String overview, String release_date, List<Integer> genre_ids, int id, String original_title, String original_language, String title, String backdrop_path, Double popularity, int vote_count, boolean video, Double vote_average) {
         this.poster_path = poster_path;
@@ -39,7 +39,8 @@ public class Movie {
     }
 
     public String getPoster_path() {
-        return mBaseImageUrl + poster_path;
+
+        return this.mBaseImageUrl + poster_path;
     }
 
     public void setPoster_path(String poster_path) {
@@ -111,7 +112,7 @@ public class Movie {
     }
 
     public String getBackdrop_path() {
-        return backdrop_path;
+        return mBaseImageUrl + backdrop_path;
     }
 
     public void setBackdrop_path(String backdrop_path) {

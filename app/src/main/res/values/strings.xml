@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">MoviesAppProva</string>
+    <string name="api_key">a8f3b88181e342b9cd44f6f623091cf4</string>
+    <string name="api_read_access_token">eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJhOGYzYjg4MTgxZTM0MmI5Y2Q0NGY2ZjYyMzA5MWNmNCIsInN1YiI6IjVlOWVlNTI3YzkyYzVkMDAxYWI3YWY1ZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.XjMDP79Z5Lucxu58yWCv2fkzLYqTcxJr6giBJivmls0</string>
+    <string name="action_settings">Settings</string>
+    <string name="movie_name">Movie Title</string>
+    <string name="movie_details">Movie Details</string>
+    <string name="movie_plot">Plot Synopsis</string>
+    <string name="rating">User Rating</string>
+    <string name="release">Release Date</string>
+    <string name="pref_sort_order_label">Sort Order</string>
+    <string name="pref_sort_order_key">sortOrder</string>
+    <string name="pref_most_popular">Most Popular</string>
+    <string name="pref_highest_rated">Highest Rated</string>
+</resources>

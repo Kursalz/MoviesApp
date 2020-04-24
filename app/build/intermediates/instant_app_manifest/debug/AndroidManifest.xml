@@ -23,7 +23,9 @@
         android:testOnly="true"
         android:theme="@style/AppTheme" >
         <activity android:name="com.d100.moviesappprova.activity.SettingsActivity" />
-        <activity android:name="com.d100.moviesappprova.activity.DetailActivity" />
+        <activity
+            android:name="com.d100.moviesappprova.activity.DetailActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name="com.d100.moviesappprova.activity.MainActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

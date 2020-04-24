@@ -53,7 +53,6 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MyViewHold
         Glide.with(mContext)
                 .load(mListMovies.get(position).getPoster_path())
                 .placeholder(R.drawable.load)//load è una gif del loading
-                .dontAnimate()
                 .into(holder.thumbnail);
     }
 

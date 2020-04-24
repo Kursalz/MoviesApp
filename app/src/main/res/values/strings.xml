@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MoviesAppProva</string>
+    <string name="app_name">Movies</string>
     <string name="api_key">a8f3b88181e342b9cd44f6f623091cf4</string>
     <string name="api_read_access_token">eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJhOGYzYjg4MTgxZTM0MmI5Y2Q0NGY2ZjYyMzA5MWNmNCIsInN1YiI6IjVlOWVlNTI3YzkyYzVkMDAxYWI3YWY1ZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.XjMDP79Z5Lucxu58yWCv2fkzLYqTcxJr6giBJivmls0</string>
     <string name="action_settings">Settings</string>

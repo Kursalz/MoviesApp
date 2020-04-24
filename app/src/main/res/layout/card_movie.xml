@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"
-        android:layout_margin="@dimen/card_margin"
+        android:layout_margin="15dp"
         android:elevation="3dp"
         app:cardCornerRadius="@dimen/card_movie_radius">
 
@@ -22,29 +22,9 @@
             <ImageView
                 android:id="@+id/thumbnail"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/movie_cover_height"
+                android:layout_height="230dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:scaleType="fitXY"/>
-
-            <TextView
-                android:id="@+id/title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingStart="@dimen/movie_title_padding"
-                android:paddingEnd="@dimen/movie_title_padding"
-                android:paddingTop="@dimen/movie_title_padding"
-                android:textColor="@color/movieTitle"
-                android:textSize="@dimen/movie_title"/>
-
-            <TextView
-                android:id="@+id/userrating"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingStart="@dimen/movie_title_padding"
-                android:paddingEnd="@dimen/movie_title_padding"
-                android:paddingBottom="@dimen/user_rating_padding_bottom"
-                android:textColor="@color/colorAccent"
-                android:textSize="@dimen/user_rating"/>
 
         </LinearLayout>
     </androidx.cardview.widget.CardView>

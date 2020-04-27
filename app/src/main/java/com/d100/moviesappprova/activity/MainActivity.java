@@ -12,14 +12,17 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.CursorLoader;
+import androidx.loader.content.Loader;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.d100.moviesappprova.R;
-import com.d100.moviesappprova.adapter.DatabaseAdapter;
 import com.d100.moviesappprova.adapter.MoviesAdapter;
 import com.d100.moviesappprova.api.Client;
 import com.d100.moviesappprova.api.Service;
@@ -35,8 +38,9 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
     public static final String TAG = "tagMainActivity";
+    private static final int LOADER_ID = 1;
 
     private RecyclerView mRecyclerView;
     private MoviesAdapter mAdapter;
@@ -51,7 +55,27 @@ public class MainActivity extends AppCompatActivity {
 
         setViews();
         setListeners();
-        initViews();
+
+        mProgressDialog = new ProgressDialog(this);
+        mProgressDialog.setMessage("Fetching movies");
+        mProgressDialog.setCancelable(false);
+        mProgressDialog.show();
+
+        mRecyclerView = findViewById(R.id.recycler_view);
+
+        if(this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            mRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+        } else {
+            mRecyclerView.setLayoutManager(new GridLayoutManager(this, 4));
+        }
+
+        //mListMovies = new ArrayList<>();
+        mAdapter = new MoviesAdapter(this, null);
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mRecyclerView.setAdapter(mAdapter);
+        getSupportLoaderManager().initLoader(LOADER_ID, null, this);
+
+        loadJSON();
     }
 
     private void setViews() {
@@ -65,30 +89,6 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "Movies refreshed", Toast.LENGTH_SHORT).show();
             }
         });
-    }
-
-    private void initViews() {
-        mProgressDialog = new ProgressDialog(this);
-        mProgressDialog.setMessage("Fetching movies");
-        mProgressDialog.setCancelable(false);
-        mProgressDialog.show();
-
-        mRecyclerView = findViewById(R.id.recycler_view);
-
-        mListMovies = new ArrayList<>();
-        mAdapter = new MoviesAdapter(this, mListMovies);
-
-        if(this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            mRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
-        } else {
-            mRecyclerView.setLayoutManager(new GridLayoutManager(this, 4));
-        }
-
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        mRecyclerView.setAdapter(mAdapter);
-        mAdapter.notifyDataSetChanged();
-
-        loadJSON();
     }
 
     private void loadJSON() {
@@ -107,10 +107,12 @@ public class MainActivity extends AppCompatActivity {
                 public void onResponse(Call<MoviesResponse> call, Response<MoviesResponse> response) {
                     List<Movie> movies = response.body().getResults();
                     ContentResolver resolver = getContentResolver();
-                    ContentValues content = new ContentValues();
+                    ContentValues content;
                     Movie movie;
                     for(int i = 0; i < movies.size(); i++){
                         movie = movies.get(i);
+
+                        content = new ContentValues();
                         content.put(TableHelper._ID, movie.getId());
                         content.put(TableHelper.POSTER_PATH, movie.getPoster_path());
                         content.put(TableHelper.ADULT, movie.isAdult());
@@ -127,8 +129,9 @@ public class MainActivity extends AppCompatActivity {
 
                         resolver.insert(Provider.FILMS_URI, content);
                     }
-                    Cursor cursor = getContentResolver().query(Provider.FILMS_URI,null,null,null,null,null);
-                    mRecyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), cursor));
+
+                    //Cursor cursor = getContentResolver().query(Provider.FILMS_URI,null,null,null,null,null);
+                    //mRecyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), cursor));
                     mRecyclerView.smoothScrollToPosition(0);
                     if(mSwipeLayout.isRefreshing()) {
                         mSwipeLayout.setRefreshing(false);
@@ -166,5 +169,21 @@ public class MainActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @NonNull
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
+        return new CursorLoader(this, Provider.FILMS_URI,null, null, null, null);
+    }
+
+    @Override
+    public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
+        mAdapter.getmCursorAdapter().changeCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(@NonNull Loader<Cursor> loader) {
+        mAdapter.getmCursorAdapter().changeCursor(null);
     }
 }

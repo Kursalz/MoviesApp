@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,9 +17,6 @@ import com.bumptech.glide.Glide;
 import com.d100.moviesappprova.R;
 import com.d100.moviesappprova.activity.DetailActivity;
 import com.d100.moviesappprova.data.TableHelper;
-import com.d100.moviesappprova.model.Movie;
-
-import java.util.List;
 
 public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MyViewHolder> {
     private Context mContext;
@@ -99,5 +95,9 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MyViewHold
                 }
             });
         }
+    }
+
+    public CursorAdapter getmCursorAdapter() {
+        return mCursorAdapter;
     }
 }

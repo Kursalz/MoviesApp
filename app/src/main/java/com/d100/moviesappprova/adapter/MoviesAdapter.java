@@ -37,8 +37,6 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MyViewHold
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        String vote = Double.toString(mListMovies.get(position).getVote_average());
-
         Glide.with(mContext)
                 .load(mListMovies.get(position).getPoster_path())
                 .placeholder(R.drawable.load)//load è una gif del loading

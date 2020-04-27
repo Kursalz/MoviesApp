@@ -1,6 +1,8 @@
 package com.d100.moviesappprova.activity;
 
 import android.app.ProgressDialog;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,6 +21,8 @@ import com.d100.moviesappprova.R;
 import com.d100.moviesappprova.adapter.MoviesAdapter;
 import com.d100.moviesappprova.api.Client;
 import com.d100.moviesappprova.api.Service;
+import com.d100.moviesappprova.data.Provider;
+import com.d100.moviesappprova.data.TableHelper;
 import com.d100.moviesappprova.model.Movie;
 import com.d100.moviesappprova.model.MoviesResponse;
 
@@ -100,11 +104,32 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(Call<MoviesResponse> call, Response<MoviesResponse> response) {
                     List<Movie> movies = response.body().getResults();
-                    mRecyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), movies));
-                    mRecyclerView.smoothScrollToPosition(0);
-                    if(mSwipeLayout.isRefreshing()) {
-                        mSwipeLayout.setRefreshing(false);
+                    ContentResolver resolver = getContentResolver();
+                    ContentValues content = new ContentValues(13);
+                    Movie movie;
+                    for(int i = 0; i < movies.size(); i++){
+                        movie = movies.get(i);
+                        content.put(TableHelper.ID, movie.getId());
+                        content.put(TableHelper.POSTER_PATH, movie.getPoster_path());
+                        content.put(TableHelper.ADULT, movie.isAdult());
+                        content.put(TableHelper.OVERVIEW, movie.getOverview());
+                        content.put(TableHelper.RELEASE_DATE, movie.getRelease_date());
+                        content.put(TableHelper.ORIGINAL_TITLE, movie.getTitle());
+                        content.put(TableHelper.ORIGINAL_LANGUAGE, movie.getOriginal_language());
+                        content.put(TableHelper.TITLE, movie.getTitle());
+                        content.put(TableHelper.BACKDROP_PATH, movie.getBackdrop_path());
+                        content.put(TableHelper.POPULARITY, movie.getPopularity());
+                        content.put(TableHelper.VOTE_COUNT, movie.getVote_count());
+                        content.put(TableHelper.VIDEO, movie.isVideo());
+                        content.put(TableHelper.VOTE_AVERAGE, movie.getVote_average());
+
+                        resolver.insert(Provider.FILMS_URI, content);
                     }
+                    //mRecyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), movies));
+                    //mRecyclerView.smoothScrollToPosition(0);
+                    //if(mSwipeLayout.isRefreshing()) {
+                    //    mSwipeLayout.setRefreshing(false);
+                    //}
                     mProgressDialog.dismiss();
                 }
 

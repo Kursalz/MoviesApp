@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.res.Configuration;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -18,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.d100.moviesappprova.R;
+import com.d100.moviesappprova.adapter.DatabaseAdapter;
 import com.d100.moviesappprova.adapter.MoviesAdapter;
 import com.d100.moviesappprova.api.Client;
 import com.d100.moviesappprova.api.Service;
@@ -105,11 +107,11 @@ public class MainActivity extends AppCompatActivity {
                 public void onResponse(Call<MoviesResponse> call, Response<MoviesResponse> response) {
                     List<Movie> movies = response.body().getResults();
                     ContentResolver resolver = getContentResolver();
-                    ContentValues content = new ContentValues(13);
+                    ContentValues content = new ContentValues();
                     Movie movie;
                     for(int i = 0; i < movies.size(); i++){
                         movie = movies.get(i);
-                        content.put(TableHelper.ID, movie.getId());
+                        content.put(TableHelper._ID, movie.getId());
                         content.put(TableHelper.POSTER_PATH, movie.getPoster_path());
                         content.put(TableHelper.ADULT, movie.isAdult());
                         content.put(TableHelper.OVERVIEW, movie.getOverview());
@@ -125,11 +127,12 @@ public class MainActivity extends AppCompatActivity {
 
                         resolver.insert(Provider.FILMS_URI, content);
                     }
-                    //mRecyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), movies));
-                    //mRecyclerView.smoothScrollToPosition(0);
-                    //if(mSwipeLayout.isRefreshing()) {
-                    //    mSwipeLayout.setRefreshing(false);
-                    //}
+                    Cursor cursor = getContentResolver().query(Provider.FILMS_URI,null,null,null,null,null);
+                    mRecyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), cursor));
+                    mRecyclerView.smoothScrollToPosition(0);
+                    if(mSwipeLayout.isRefreshing()) {
+                        mSwipeLayout.setRefreshing(false);
+                    }
                     mProgressDialog.dismiss();
                 }
 
@@ -142,6 +145,10 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
             Log.d(TAG, "loadJSON: " + e.getMessage());
         }
+    }
+
+    private void loadDb(){
+
     }
 
     @Override

@@ -130,8 +130,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                         resolver.insert(Provider.FILMS_URI, content);
                     }
 
-                    //Cursor cursor = getContentResolver().query(Provider.FILMS_URI,null,null,null,null,null);
-                    //mRecyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), cursor));
+                    Cursor cursor = getContentResolver().query(Provider.FILMS_URI,null,null,null,null,null);
+                    mRecyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), cursor));
                     mRecyclerView.smoothScrollToPosition(0);
                     if(mSwipeLayout.isRefreshing()) {
                         mSwipeLayout.setRefreshing(false);

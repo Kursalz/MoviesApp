@@ -30,8 +30,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MyViewHold
             @Override
             public View newView(Context context, Cursor cursor, ViewGroup parent) {
                 // Inflate the view here
-                View v = LayoutInflater.from(context)
-                        .inflate(R.layout.card_movie, parent, false);
+                View v = LayoutInflater.from(context).inflate(R.layout.card_movie, parent, false);
                 return v;
             }
 

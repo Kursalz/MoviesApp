@@ -38,7 +38,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MyViewHold
         String poster_path = mCursor.getString(mCursor.getColumnIndexOrThrow(TableHelper.POSTER_PATH));
         Glide.with(mContext)
                 .load(poster_path)
-                .placeholder(R.drawable.load)//load è una gif del loading
+                .placeholder(R.drawable.poster_default)//load è una gif del loading
                 .into(holder.thumbnail);
     }
 
@@ -69,7 +69,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MyViewHold
                         vIntent.putExtra(ORIGINAL_TITLE, mCursor.getString(mCursor.getColumnIndex(TableHelper.ORIGINAL_TITLE)));
                         vIntent.putExtra(BACKDROP_PATH, mCursor.getString(mCursor.getColumnIndex(TableHelper.BACKDROP_PATH)));
                         vIntent.putExtra(OVERVIEW, mCursor.getString(mCursor.getColumnIndex(TableHelper.OVERVIEW)));
-                        vIntent.putExtra(VOTE_AVERAGE, mCursor.getDouble(mCursor.getColumnIndex(TableHelper.VOTE_AVERAGE)));
+                        vIntent.putExtra(VOTE_AVERAGE, mCursor.getString(mCursor.getColumnIndex(TableHelper.VOTE_AVERAGE)));
                         vIntent.putExtra(RELEASE_DATE, mCursor.getString(mCursor.getColumnIndex(TableHelper.RELEASE_DATE)));
                         vIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         mContext.startActivity(vIntent);

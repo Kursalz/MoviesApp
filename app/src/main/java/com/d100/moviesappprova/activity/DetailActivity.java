@@ -52,7 +52,7 @@ public class DetailActivity extends AppCompatActivity {
 
             Glide.with(this)
                     .load(thumbnail)
-                    .placeholder(R.drawable.load)
+                    .placeholder(R.drawable.backdrop_default)
                     .into(mImageView);
 
             mTxtMovieName.setText(movieName);

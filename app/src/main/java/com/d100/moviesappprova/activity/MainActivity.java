@@ -8,7 +8,10 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.inputmethod.EditorInfo;
+import android.widget.SearchView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -38,7 +41,6 @@ public class MainActivity extends AppCompatActivity {
 
     private RecyclerView mRecyclerView;
     private MoviesAdapter mAdapter;
-    private List<Movie> mListMovies;
     ProgressDialog mProgressDialog;
     private SwipeRefreshLayout mSwipeLayout;
 
@@ -80,6 +82,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onRefresh() {
                 Toast.makeText(MainActivity.this, "Movies refreshed", Toast.LENGTH_SHORT).show();
+                loadJSON();
+                mSwipeLayout.setRefreshing(false);
             }
         });
     }
@@ -121,16 +125,13 @@ public class MainActivity extends AppCompatActivity {
 
                         resolver.insert(Provider.FILMS_URI, content);
                     }
-                    if(mSwipeLayout.isRefreshing()) {
-                        mSwipeLayout.setRefreshing(false);
-                    }
                     mProgressDialog.dismiss();
                 }
 
                 @Override
                 public void onFailure(Call<MoviesResponse> call, Throwable t) {
                     Log.d(TAG, "onFailure: " + t.getMessage());
-                    Toast.makeText(MainActivity.this, "Error occurred while fetching data", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Server non raggiungibile", Toast.LENGTH_SHORT).show();
                 }
             });
         } catch (Exception e) {
@@ -148,14 +149,40 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main, menu);
+
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) searchItem.getActionView();
+
+        searchView.setImeOptions(EditorInfo.IME_ACTION_DONE);
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                final Cursor cursor = getContentResolver().query(Provider.FILMS_URI, null, TableHelper.TITLE + " LIKE \'" + s + "\'", null, null, null);
+                mRecyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), cursor));
+                mRecyclerView.smoothScrollToPosition(0);
+                return false;
+            }
+
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                final Cursor cursor = getContentResolver().query(Provider.FILMS_URI, null, TableHelper.TITLE + " LIKE \'" + s + "\'", null, null, null);
+                mRecyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), cursor));
+                mRecyclerView.smoothScrollToPosition(0);
+                return false;
+
+            }
+        });
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_settings:
+            case R.id.action_search:
                 return true;
 
             default:

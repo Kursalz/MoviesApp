@@ -63,13 +63,12 @@ public class MainActivity extends AppCompatActivity {
             mRecyclerView.setLayoutManager(new GridLayoutManager(this, 4));
         }
 
-        //mListMovies = new ArrayList<>();
         Cursor cursor = getContentResolver().query(Provider.FILMS_URI, null, null, null, null, null);
         mAdapter = new MoviesAdapter(getApplicationContext(), cursor);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setAdapter(mAdapter);
-
         loadJSON();
+
     }
 
     private void setViews() {
@@ -122,10 +121,6 @@ public class MainActivity extends AppCompatActivity {
 
                         resolver.insert(Provider.FILMS_URI, content);
                     }
-
-                    Cursor cursor = getContentResolver().query(Provider.FILMS_URI, null, null, null, null, null);
-                    mRecyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), cursor));
-                    mRecyclerView.smoothScrollToPosition(0);
                     if(mSwipeLayout.isRefreshing()) {
                         mSwipeLayout.setRefreshing(false);
                     }
@@ -141,10 +136,14 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
             Log.d(TAG, "loadJSON: " + e.getMessage());
         }
+        mProgressDialog.dismiss();
+        loadDb();
     }
 
     private void loadDb() {
-
+        Cursor cursor = getContentResolver().query(Provider.FILMS_URI, null, null, null, null, null);
+        mRecyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), cursor));
+        mRecyclerView.smoothScrollToPosition(0);
     }
 
     @Override

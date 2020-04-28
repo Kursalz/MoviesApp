@@ -34,14 +34,12 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MyViewHold
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        if (position != -1) {
-            mCursor.moveToPosition(position);
+        mCursor.moveToPosition(position);
             String poster_path = mCursor.getString(mCursor.getColumnIndexOrThrow(TableHelper.POSTER_PATH));
             Glide.with(mContext)
                     .load(poster_path)
                     .placeholder(R.drawable.load)//load è una gif del loading
                     .into(holder.thumbnail);
-        }
     }
 
     @Override

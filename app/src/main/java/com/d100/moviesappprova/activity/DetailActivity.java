@@ -6,6 +6,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -20,6 +21,8 @@ import com.google.android.material.appbar.CollapsingToolbarLayout;
 public class DetailActivity extends AppCompatActivity {
     TextView mTxtMovieName, mTxtSynopsis, mTxtUserRating, mTxtReleaseDate;
     ImageView mImageView;
+    AppBarLayout mAppBarLayout;
+    private String TAG = "tagDetailActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,10 +78,10 @@ public class DetailActivity extends AppCompatActivity {
         final CollapsingToolbarLayout collToolLayout = findViewById(R.id.collapsingToolBar);
         collToolLayout.setTitle("");
 
-        AppBarLayout appBarLayout = findViewById(R.id.appbar);
-        appBarLayout.setExpanded(true);
+        mAppBarLayout = findViewById(R.id.appbar);
+        mAppBarLayout.setExpanded(true);
 
-        appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+        mAppBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             boolean isShown = false;
             int scrollRange = -1;
 
@@ -88,12 +91,14 @@ public class DetailActivity extends AppCompatActivity {
                     scrollRange = appBarLayout.getTotalScrollRange();
                 }
 
-                if(scrollRange + verticalOffset == 0) {
+                if(scrollRange + verticalOffset <= 0) {
                     collToolLayout.setTitle(getString(R.string.movie_details));
                     isShown = true;
+                    Log.d(TAG, "onOffsetChanged: isshown true: " + collToolLayout.getTitle());
                 } else if(isShown) {
                     collToolLayout.setTitle("");
                     isShown = false;
+                    Log.d(TAG, "onOffsetChanged: isshown false: " + collToolLayout.getTitle());
                 }
             }
         });

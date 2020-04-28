@@ -107,12 +107,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 public void onResponse(Call<MoviesResponse> call, Response<MoviesResponse> response) {
                     List<Movie> movies = response.body().getResults();
                     ContentResolver resolver = getContentResolver();
-                    ContentValues content;
+                    ContentValues content = new ContentValues();
                     Movie movie;
                     for(int i = 0; i < movies.size(); i++){
                         movie = movies.get(i);
 
-                        content = new ContentValues();
                         content.put(TableHelper._ID, movie.getId());
                         content.put(TableHelper.POSTER_PATH, movie.getPoster_path());
                         content.put(TableHelper.ADULT, movie.isAdult());

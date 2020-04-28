@@ -5,6 +5,7 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
@@ -18,10 +19,10 @@ public class Provider extends ContentProvider {
     public static final String BASE_PATH_FILMS = "films";
     public static final int ALL_FILM = 1;
     public static final int SINGLE_FILM = 0;
-    public static final String MIME_TYPE_FILMS = ContentResolver.CURSOR_DIR_BASE_TYPE+"vnd.all_films";
-    public static final String MIME_TYPE_FILM = ContentResolver.CURSOR_ITEM_BASE_TYPE+"vnd.single_film";
+    public static final String MIME_TYPE_FILMS = ContentResolver.CURSOR_DIR_BASE_TYPE + "vnd.all_films";
+    public static final String MIME_TYPE_FILM = ContentResolver.CURSOR_ITEM_BASE_TYPE + "vnd.single_film";
 
-    public static Uri FILMS_URI = Uri.parse(ContentResolver.SCHEME_CONTENT+"://"+AUTORITY+"/"+ BASE_PATH_FILMS);
+    public static Uri FILMS_URI = Uri.parse(ContentResolver.SCHEME_CONTENT + "://" + AUTORITY + "/" + BASE_PATH_FILMS);
 
     private DB mDb;
 
@@ -44,19 +45,19 @@ public class Provider extends ContentProvider {
         SQLiteDatabase vDb = mDb.getReadableDatabase();
         SQLiteQueryBuilder vBuilder = new SQLiteQueryBuilder();
 
-        switch (mUriMatcher.match(uri)){
+        switch (mUriMatcher.match(uri)) {
             case ALL_FILM:
                 vBuilder.setTables(TableHelper.TABLE_NAME);
                 break;
             case SINGLE_FILM:
                 vBuilder.setTables(TableHelper.TABLE_NAME);
-                vBuilder.appendWhere(TableHelper._ID+" = "+uri.getLastPathSegment());
+                vBuilder.appendWhere(TableHelper._ID + " = " + uri.getLastPathSegment());
                 break;
         }
 
-        Cursor vCursor = vBuilder.query(vDb,strings,s,strings1,null,null,s1);
+        Cursor vCursor = vBuilder.query(vDb, strings, s, strings1, null, null, s1);
 
-        vCursor.setNotificationUri(getContext().getContentResolver(),uri);
+        vCursor.setNotificationUri(getContext().getContentResolver(), uri);
 
         return vCursor;
     }
@@ -77,12 +78,20 @@ public class Provider extends ContentProvider {
     @Override
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues contentValues) {
 
-        if (mUriMatcher.match(uri)== ALL_FILM){
-            SQLiteDatabase vDb = mDb.getWritableDatabase();
-            long vResult = vDb.insert(TableHelper.TABLE_NAME, null, contentValues);
-            String vString = ContentResolver.SCHEME_CONTENT+"://"+ BASE_PATH_FILMS +"/"+vResult;
-            getContext().getContentResolver().notifyChange(uri, null);
-            return Uri.parse(uri.toString()+"/"+vString);
+        try {
+            if (mUriMatcher.match(uri) == ALL_FILM) {
+                SQLiteDatabase vDb = mDb.getWritableDatabase();
+                long vResult = vDb.insertOrThrow(TableHelper.TABLE_NAME, null, contentValues);
+                String vString = ContentResolver.SCHEME_CONTENT + "://" + BASE_PATH_FILMS + "/" + vResult;
+                getContext().getContentResolver().notifyChange(uri, null);
+                return Uri.parse(uri.toString() + "/" + vString);
+            }
+
+        } catch (SQLiteConstraintException e) {
+            int nRows = update(uri, contentValues, null, null);
+            if (nRows == 0){
+                throw e;
+            }
         }
         return null;
     }
@@ -94,21 +103,21 @@ public class Provider extends ContentProvider {
 
         SQLiteDatabase vDb = mDb.getWritableDatabase();
 
-        switch (mUriMatcher.match(uri)){
+        switch (mUriMatcher.match(uri)) {
             case ALL_FILM:
                 vTableName = TableHelper.TABLE_NAME;
                 vQuery = s;
                 break;
             case SINGLE_FILM:
                 vTableName = TableHelper.TABLE_NAME;
-                vQuery = TableHelper._ID+" = "+uri.getLastPathSegment();
-                if (s!=null){
-                    vQuery+=" AND "+s;
+                vQuery = TableHelper._ID + " = " + uri.getLastPathSegment();
+                if (s != null) {
+                    vQuery += " AND " + s;
                 }
                 break;
         }
-        int vDeletedRows = vDb.delete(vTableName,vQuery,strings);
-        getContext().getContentResolver().notifyChange(uri,null);
+        int vDeletedRows = vDb.delete(vTableName, vQuery, strings);
+        getContext().getContentResolver().notifyChange(uri, null);
 
         return vDeletedRows;
     }
@@ -120,21 +129,21 @@ public class Provider extends ContentProvider {
 
         SQLiteDatabase vDb = mDb.getWritableDatabase();
 
-        switch (mUriMatcher.match(uri)){
+        switch (mUriMatcher.match(uri)) {
             case ALL_FILM:
                 vTableName = TableHelper.TABLE_NAME;
                 vQuery = s;
                 break;
             case SINGLE_FILM:
                 vTableName = TableHelper.TABLE_NAME;
-                vQuery = TableHelper._ID+" = "+uri.getLastPathSegment();
-                if (s!=null){
-                    vQuery+=" AND "+s;
+                vQuery = TableHelper._ID + " = " + uri.getLastPathSegment();
+                if (s != null) {
+                    vQuery += " AND " + s;
                 }
                 break;
         }
-        int vUpdatedRows = vDb.update(vTableName, contentValues,vQuery,strings);
-        getContext().getContentResolver().notifyChange(uri,null);
+        int vUpdatedRows = vDb.update(vTableName, contentValues, vQuery, strings);
+        getContext().getContentResolver().notifyChange(uri, null);
 
         return vUpdatedRows;
     }

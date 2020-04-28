@@ -12,11 +12,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.loader.app.LoaderManager;
-import androidx.loader.content.CursorLoader;
-import androidx.loader.content.Loader;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -31,7 +27,6 @@ import com.d100.moviesappprova.data.TableHelper;
 import com.d100.moviesappprova.model.Movie;
 import com.d100.moviesappprova.model.MoviesResponse;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -40,7 +35,6 @@ import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
     public static final String TAG = "tagMainActivity";
-    private static final int LOADER_ID = 1;
 
     private RecyclerView mRecyclerView;
     private MoviesAdapter mAdapter;
@@ -63,14 +57,15 @@ public class MainActivity extends AppCompatActivity {
 
         mRecyclerView = findViewById(R.id.recycler_view);
 
-        if(this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+        if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
             mRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
         } else {
             mRecyclerView.setLayoutManager(new GridLayoutManager(this, 4));
         }
 
         //mListMovies = new ArrayList<>();
-        mAdapter = new MoviesAdapter(this, null);
+        Cursor cursor = getContentResolver().query(Provider.FILMS_URI, null, null, null, null, null);
+        mAdapter = new MoviesAdapter(getApplicationContext(), cursor);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setAdapter(mAdapter);
 
@@ -92,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void loadJSON() {
         try {
-            if(getString(R.string.api_key).isEmpty()) { //BuildConfig.THE_MOVIE_DB_API_TOKEN
+            if (getString(R.string.api_key).isEmpty()) { //BuildConfig.THE_MOVIE_DB_API_TOKEN
                 Toast.makeText(this, "Please obtain api key", Toast.LENGTH_SHORT).show();
                 mProgressDialog.dismiss();
                 return;
@@ -108,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
                     ContentResolver resolver = getContentResolver();
                     ContentValues content = new ContentValues();
                     Movie movie;
-                    for(int i = 0; i < movies.size(); i++){
+                    for (int i = 0; i < movies.size(); i++) {
                         movie = movies.get(i);
 
                         content.put(TableHelper._ID, movie.getId());
@@ -128,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
                         resolver.insert(Provider.FILMS_URI, content);
                     }
 
-                    Cursor cursor = getContentResolver().query(Provider.FILMS_URI,null,null,null,null,null);
+                    Cursor cursor = getContentResolver().query(Provider.FILMS_URI, null, null, null, null, null);
                     mRecyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), cursor));
                     mRecyclerView.smoothScrollToPosition(0);
                     if(mSwipeLayout.isRefreshing()) {
@@ -148,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void loadDb(){
+    private void loadDb() {
 
     }
 

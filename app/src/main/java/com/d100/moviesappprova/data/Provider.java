@@ -13,6 +13,8 @@ import android.net.Uri;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.d100.moviesappprova.activity.MainActivity;
+
 public class Provider extends ContentProvider {
 
     public static final String AUTORITY = "com.d100.moviesappprova.data.Provider";
@@ -88,7 +90,8 @@ public class Provider extends ContentProvider {
             }
 
         } catch (SQLiteConstraintException e) {
-            int nRows = update(uri, contentValues, null, null);
+            int movieId = contentValues.getAsInteger(TableHelper._ID);
+            int nRows = update(Uri.parse(Provider.FILMS_URI + "/" + movieId), contentValues, null, null);
             if (nRows == 0){
                 throw e;
             }

@@ -38,7 +38,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class MainActivity extends AppCompatActivity {
     public static final String TAG = "tagMainActivity";
     private static final int LOADER_ID = 1;
 
@@ -73,7 +73,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mAdapter = new MoviesAdapter(this, null);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setAdapter(mAdapter);
-        getSupportLoaderManager().initLoader(LOADER_ID, null, this);
 
         loadJSON();
     }
@@ -168,21 +167,5 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-
-    @NonNull
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
-        return new CursorLoader(this, Provider.FILMS_URI,null, null, null, null);
-    }
-
-    @Override
-    public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
-        mAdapter.getmCursorAdapter().changeCursor(data);
-    }
-
-    @Override
-    public void onLoaderReset(@NonNull Loader<Cursor> loader) {
-        mAdapter.getmCursorAdapter().changeCursor(null);
     }
 }

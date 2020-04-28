@@ -25,11 +25,12 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MyViewHold
 
     public MoviesAdapter(Context context, Cursor cursor) {
         this.mContext = context;
-        mCursorAdapter = new CursorAdapter(mContext, cursor, 0) {
 
+        mCursorAdapter = new CursorAdapter(mContext, cursor, 0) {
             @Override
             public View newView(Context context, Cursor cursor, ViewGroup parent) {
                 // Inflate the view here
+                // View v = LayoutInflater.from(context).inflate(R.layout.card_movie, null);
                 View v = LayoutInflater.from(context).inflate(R.layout.card_movie, parent, false);
                 return v;
             }

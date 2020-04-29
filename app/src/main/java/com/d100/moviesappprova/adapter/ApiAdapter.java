@@ -37,7 +37,7 @@ public class ApiAdapter extends RecyclerView.Adapter<ApiAdapter.MyViewHolder> {
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         Glide.with(mContext)
             .load(mListMovies.get(position).getPoster_path())
-            .placeholder(R.drawable.load)//load è una gif del loading
+            .placeholder(R.drawable.poster_default)//load è una gif del loading
             .into(holder.thumbnail);
     }
 

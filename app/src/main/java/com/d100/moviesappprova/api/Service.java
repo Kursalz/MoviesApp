@@ -13,6 +13,6 @@ public interface Service {
     @GET("movie/top_rated")
     Call<MoviesResponse> getTopRatedMovies(@Query("api_key") String apiKey);
 
-    @GET("search/multi")
+    @GET("search/movie")
     Call<MoviesResponse> getMoviesByTitle(@Query("api_key") String apiKey, @Query("query") String title);
 }

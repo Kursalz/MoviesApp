@@ -96,8 +96,8 @@ public class MainActivity extends AppCompatActivity {
             public boolean onMenuItemActionCollapse(MenuItem item) {
                 hideKeyboard(MainActivity.this);
                 searchView.onActionViewCollapsed();
-                loadJSON();
                 mSwipeLayout.setEnabled(true);
+                loadJSON();
                 return true;
             }
         });
@@ -122,6 +122,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void search(String s) {
+        final String ms = s;
         try {
             checkApiKey();
 
@@ -147,15 +148,14 @@ public class MainActivity extends AppCompatActivity {
                 public void onFailure(Call<MoviesResponse> call, Throwable t) {
                     Log.d(TAG, "onFailure search: " + t.getMessage());
                     Toast.makeText(MainActivity.this, "Server non raggiungibile", Toast.LENGTH_SHORT).show();
+                    final Cursor cursor = getContentResolver().query(Provider.FILMS_URI, null, TableHelper.TITLE + " LIKE \'%" + ms + "%\'", null, null, null);
+                    mRecyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), cursor));
+                    mRecyclerView.smoothScrollToPosition(0);
                 }
             });
 
         } catch (Exception e) {
             Log.d(TAG, "onQueryTextSubmit: exception: " + e.getMessage());
-
-            final Cursor cursor = getContentResolver().query(Provider.FILMS_URI, null, TableHelper.TITLE + " LIKE \'%" + s + "%\'", null, null, null);
-            mRecyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), cursor));
-            mRecyclerView.smoothScrollToPosition(0);
         }
 
     }
@@ -186,8 +186,7 @@ public class MainActivity extends AppCompatActivity {
     private void loadJSON() {
         try {
             checkApiKey();
-
-            Service vApiService = Client.getClient().create(Service.class);
+            final Service vApiService = Client.getClient().create(Service.class);
             Call<MoviesResponse> call = vApiService.getPopularMovies(getString(R.string.api_key));
 
             call.enqueue(new Callback<MoviesResponse>() {

@@ -94,11 +94,10 @@ public class DetailActivity extends AppCompatActivity {
                 if(scrollRange + verticalOffset <= 0) {
                     collToolLayout.setTitle(getString(R.string.movie_details));
                     isShown = true;
-                    Log.d(TAG, "onOffsetChanged: isshown true: " + collToolLayout.getTitle());
+
                 } else if(isShown) {
                     collToolLayout.setTitle("");
                     isShown = false;
-                    Log.d(TAG, "onOffsetChanged: isshown false: " + collToolLayout.getTitle());
                 }
             }
         });

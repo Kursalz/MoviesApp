@@ -139,7 +139,6 @@ public class MainActivity extends AppCompatActivity {
                     } else {
                         movies = response.body().getResults();
                     }
-
                     mRecyclerView.setAdapter(new ApiAdapter(getApplicationContext(), movies));
                     mRecyclerView.smoothScrollToPosition(0);
                 }
@@ -202,19 +201,21 @@ public class MainActivity extends AppCompatActivity {
                         resolver.insert(Provider.FILMS_URI, content);
                     }
                     mProgressDialog.dismiss();
+                    mRecyclerView.setAdapter(new ApiAdapter(getApplicationContext(),movies));
+                    mRecyclerView.smoothScrollToPosition(0);
                 }
 
                 @Override
                 public void onFailure(Call<MoviesResponse> call, Throwable t) {
                     Log.d(TAG, "onFailure: " + t.getMessage());
                     Toast.makeText(MainActivity.this, "Server non raggiungibile", Toast.LENGTH_SHORT).show();
+                    loadDb();
                 }
             });
         } catch (Exception e) {
             Log.d(TAG, "loadJSON: " + e.getMessage());
         }
         mProgressDialog.dismiss();
-        loadDb();
     }
 
     private ContentValues createContentValues(Movie movie) {

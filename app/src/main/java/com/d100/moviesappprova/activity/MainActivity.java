@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(final Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
 
@@ -87,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
         MenuItemCompat.setOnActionExpandListener(searchItem, new MenuItemCompat.OnActionExpandListener() {
             @Override
             public boolean onMenuItemActionExpand(MenuItem item) {
+                searchView.onActionViewCollapsed();
                 mSwipeLayout.setEnabled(false);
                 searchView.onActionViewExpanded();
                 return true;
@@ -95,7 +96,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onMenuItemActionCollapse(MenuItem item) {
                 hideKeyboard(MainActivity.this);
-                searchView.onActionViewCollapsed();
                 mSwipeLayout.setEnabled(true);
                 loadJSON();
                 return true;
@@ -114,7 +114,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onQueryTextChange(String s) {
                 search(s);
-
                 return false;
             }
         });

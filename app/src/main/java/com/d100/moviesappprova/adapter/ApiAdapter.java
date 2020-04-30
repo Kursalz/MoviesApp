@@ -46,6 +46,11 @@ public class ApiAdapter extends RecyclerView.Adapter<ApiAdapter.MyViewHolder> {
         return mListMovies.size();
     }
 
+    public void addMovies(List<Movie> aListMovies) {
+        mListMovies.addAll(aListMovies);
+        notifyDataSetChanged();
+    }
+
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public static final String ORIGINAL_TITLE = "original_title";
         public static final String BACKDROP_PATH = "backdrop_path";
@@ -80,4 +85,5 @@ public class ApiAdapter extends RecyclerView.Adapter<ApiAdapter.MyViewHolder> {
             });
         }
     }
+
 }

@@ -17,6 +17,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.SearchView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.MenuItemCompat;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -46,8 +47,17 @@ public class MainActivity extends AppCompatActivity {
 
     private RecyclerView mRecyclerView;
     private MoviesAdapter mAdapter;
+    private ApiAdapter mApiAdapter;
     ProgressDialog mProgressDialog;
     private SwipeRefreshLayout mSwipeLayout;
+    private GridLayoutManager mLayoutManager;
+
+    private List<Movie> mListMovies;
+
+    private String mSearchString;
+    private int mPreviousTotal = 0, mVisibleThreshold = 5;
+    int mFirstVisibleItem, mVisibleItemCount, mTotalItemCount, mCurrentPage;
+    private boolean mLoading = true, mSearchMode = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,13 +67,7 @@ public class MainActivity extends AppCompatActivity {
         setViews();
         setListeners();
         setProgressDialog();
-
-        // set number of movies shown in a row based on screen orientation
-        if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            mRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
-        } else {
-            mRecyclerView.setLayoutManager(new GridLayoutManager(this, 4));
-        }
+        setRecyclerView();
 
         // get movies from internal database and load into recyclerview
         Cursor cursor = getContentResolver().query(Provider.FILMS_URI, null, null, null, null, null);
@@ -72,7 +76,8 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView.setAdapter(mAdapter);
 
         // load movies from api
-        loadJSON();
+        mApiAdapter = new ApiAdapter(getApplicationContext(), new ArrayList<Movie>());
+        loadJSON(1);
     }
 
     @Override
@@ -90,6 +95,7 @@ public class MainActivity extends AppCompatActivity {
                 searchView.onActionViewCollapsed();
                 mSwipeLayout.setEnabled(false);
                 searchView.onActionViewExpanded();
+                mSearchMode = true;
                 return true;
             }
 
@@ -97,7 +103,8 @@ public class MainActivity extends AppCompatActivity {
             public boolean onMenuItemActionCollapse(MenuItem item) {
                 hideKeyboard(MainActivity.this);
                 mSwipeLayout.setEnabled(true);
-                loadJSON();
+                mSearchMode = false;
+                loadJSON(1);
                 return true;
             }
         });
@@ -105,7 +112,8 @@ public class MainActivity extends AppCompatActivity {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
-                search(s);
+                mSearchString = s;
+                search(s, 1);
                 searchView.clearFocus();
 
                 return false;
@@ -113,49 +121,13 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String s) {
-                search(s);
+                mSearchString = s;
+                search(s, 1);
+
                 return false;
             }
         });
         return true;
-    }
-
-    private void search(String s) {
-        final String ms = s;
-        try {
-            checkApiKey();
-
-            Service vApiService = Client.getClient().create(Service.class);
-            Call<MoviesResponse> call = vApiService.getMoviesByTitle(getString(R.string.api_key), s);
-
-            call.enqueue(new Callback<MoviesResponse>() {
-                @Override
-                public void onResponse(Call<MoviesResponse> call, Response<MoviesResponse> response) {
-                    List<Movie> movies;
-
-                    if(response.body() == null) {
-                        movies = new ArrayList<>();
-                    } else {
-                        movies = response.body().getResults();
-                    }
-                    mRecyclerView.setAdapter(new ApiAdapter(getApplicationContext(), movies));
-                    mRecyclerView.smoothScrollToPosition(0);
-                }
-
-                @Override
-                public void onFailure(Call<MoviesResponse> call, Throwable t) {
-                    Log.d(TAG, "onFailure search: " + t.getMessage());
-                    Toast.makeText(MainActivity.this, "Server non raggiungibile", Toast.LENGTH_SHORT).show();
-                    final Cursor cursor = getContentResolver().query(Provider.FILMS_URI, null, TableHelper.TITLE + " LIKE \'%" + ms + "%\'", null, null, null);
-                    mRecyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), cursor));
-                    mRecyclerView.smoothScrollToPosition(0);
-                }
-            });
-
-        } catch (Exception e) {
-            Log.d(TAG, "onQueryTextSubmit: exception: " + e.getMessage());
-        }
-
     }
 
     private void setProgressDialog() {
@@ -175,33 +147,80 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onRefresh() {
                 Toast.makeText(MainActivity.this, "Movies refreshed", Toast.LENGTH_SHORT).show();
-                loadJSON();
+                loadJSON(1);
                 mSwipeLayout.setRefreshing(false);
             }
         });
     }
 
-    private void loadJSON() {
+    private void setRecyclerView() {
+        if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            mLayoutManager = new GridLayoutManager(this, 2);
+        } else {
+            mLayoutManager = new GridLayoutManager(this, 4);
+        }
+
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                mVisibleItemCount = mRecyclerView.getChildCount();
+                mTotalItemCount = mLayoutManager.getItemCount();
+                mFirstVisibleItem = mLayoutManager.findFirstVisibleItemPosition();
+
+                if (dy > 0) {
+                    if (mLoading) {
+                        if (mTotalItemCount > mPreviousTotal) {
+                            mLoading = false;
+                            mPreviousTotal = mTotalItemCount;
+                        }
+                    }
+
+                    if (!mLoading && (mTotalItemCount - mVisibleItemCount) <= (mFirstVisibleItem + mVisibleThreshold)) {
+                        if (!mSearchMode) {
+                            loadJSON(mCurrentPage + 1);
+                        } else {
+                            search(mSearchString, mCurrentPage + 1);
+                        }
+                        mLoading = true;
+                        Log.d(TAG, "onScrolled: end of scroll");
+                    }
+                }
+            }
+        });
+    }
+
+    private void loadJSON(final int page) {
         try {
             checkApiKey();
+
             final Service vApiService = Client.getClient().create(Service.class);
-            Call<MoviesResponse> call = vApiService.getPopularMovies(getString(R.string.api_key));
+            Call<MoviesResponse> call = vApiService.getPopularMovies(getString(R.string.api_key), page);
 
             call.enqueue(new Callback<MoviesResponse>() {
                 @Override
                 public void onResponse(Call<MoviesResponse> call, Response<MoviesResponse> response) {
                     List<Movie> movies = response.body().getResults();
                     ContentResolver resolver = getContentResolver();
-                    ContentValues content = new ContentValues();
-                    Movie movie;
+
                     for (int i = 0; i < movies.size(); i++) {
-                        movie = movies.get(i);
-                        content = createContentValues(movie);
-                        resolver.insert(Provider.FILMS_URI, content);
+                        resolver.insert(Provider.FILMS_URI, createContentValues(movies.get(i)));
                     }
                     mProgressDialog.dismiss();
-                    mRecyclerView.setAdapter(new ApiAdapter(getApplicationContext(),movies));
-                    mRecyclerView.smoothScrollToPosition(0);
+
+                    if(mLoading) {
+                        mApiAdapter.addMovies(movies);
+                    } else {
+                        mApiAdapter = new ApiAdapter(getApplicationContext(), movies);
+                        mRecyclerView.smoothScrollToPosition(0);
+                    }
+
+                    mRecyclerView.setAdapter(mApiAdapter);
+                    mCurrentPage = page;
                 }
 
                 @Override
@@ -215,6 +234,59 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "loadJSON: " + e.getMessage());
         }
         mProgressDialog.dismiss();
+    }
+
+    private void search(String s, final int page) {
+        final String ms = s;
+        try {
+            checkApiKey();
+
+            Service vApiService = Client.getClient().create(Service.class);
+            Call<MoviesResponse> call = vApiService.getMoviesByTitle(getString(R.string.api_key), s, page);
+
+            call.enqueue(new Callback<MoviesResponse>() {
+                @Override
+                public void onResponse(Call<MoviesResponse> call, Response<MoviesResponse> response) {
+                    List<Movie> movies;
+
+                    if(response.body() == null) {
+                        movies = new ArrayList<>();
+                    } else {
+                        movies = response.body().getResults();
+                    }
+
+                    if(mLoading) {
+                        mApiAdapter.addMovies(movies);
+                    } else {
+                        mApiAdapter = new ApiAdapter(getApplicationContext(), movies);
+                        mRecyclerView.smoothScrollToPosition(0);
+                    }
+
+                    mRecyclerView.setAdapter(mApiAdapter);
+
+                    mCurrentPage = page;
+                }
+
+                @Override
+                public void onFailure(Call<MoviesResponse> call, Throwable t) {
+                    Log.d(TAG, "onFailure search: " + t.getMessage());
+                    Toast.makeText(MainActivity.this, "Server non raggiungibile", Toast.LENGTH_SHORT).show();
+                    final Cursor cursor = getContentResolver().query(Provider.FILMS_URI, null, TableHelper.TITLE + " LIKE \'%" + ms + "%\'", null, null, null);
+                    mRecyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), cursor));
+                    mRecyclerView.smoothScrollToPosition(0);
+                }
+            });
+
+        } catch (Exception e) {
+            Log.d(TAG, "onQueryTextSubmit: exception: " + e.getMessage());
+        }
+
+    }
+
+    private void loadDb() {
+        Cursor cursor = getContentResolver().query(Provider.FILMS_URI, null, null, null, null, null);
+        mRecyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), cursor));
+        mRecyclerView.smoothScrollToPosition(0);
     }
 
     private ContentValues createContentValues(Movie movie) {
@@ -243,12 +315,6 @@ public class MainActivity extends AppCompatActivity {
             mProgressDialog.dismiss();
             return;
         }
-    }
-
-    private void loadDb() {
-        Cursor cursor = getContentResolver().query(Provider.FILMS_URI, null, null, null, null, null);
-        mRecyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), cursor));
-        mRecyclerView.smoothScrollToPosition(0);
     }
 
     public static void hideKeyboard(Activity activity) {

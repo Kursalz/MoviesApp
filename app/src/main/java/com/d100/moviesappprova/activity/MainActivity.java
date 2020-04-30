@@ -212,7 +212,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                     mProgressDialog.dismiss();
 
-                    if(mLoading) {
+                    if(page > 1) {
                         mApiAdapter.addMovies(movies);
                     } else {
                         mApiAdapter = new ApiAdapter(getApplicationContext(), movies);
@@ -255,7 +255,7 @@ public class MainActivity extends AppCompatActivity {
                         movies = response.body().getResults();
                     }
 
-                    if(mLoading) {
+                    if(page > 1) {
                         mApiAdapter.addMovies(movies);
                     } else {
                         mApiAdapter = new ApiAdapter(getApplicationContext(), movies);

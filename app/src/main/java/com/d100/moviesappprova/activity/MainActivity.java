@@ -96,7 +96,6 @@ public class MainActivity extends AppCompatActivity {
                 mSwipeLayout.setEnabled(false);
                 searchView.onActionViewExpanded();
                 mSearchMode = true;
-                mPreviousTotal = 0;
                 return true;
             }
 
@@ -105,7 +104,6 @@ public class MainActivity extends AppCompatActivity {
                 hideKeyboard(MainActivity.this);
                 mSwipeLayout.setEnabled(true);
                 mSearchMode = false;
-                mPreviousTotal = 0;
                 loadJSON(1);
                 return true;
             }
@@ -175,10 +173,6 @@ public class MainActivity extends AppCompatActivity {
                 mFirstVisibleItem = mLayoutManager.findFirstVisibleItemPosition();
 
                 if (dy > 0) {
-                    Log.d(TAG, "onScrolled: totalItemCount: " + mTotalItemCount);
-                    Log.d(TAG, "onScrolled: previousTotal: " + mPreviousTotal);
-                    Log.d(TAG, "onScrolled: mloading: " + mLoading);
-
                     if (mLoading) {
                         if (mTotalItemCount > mPreviousTotal) {
                             mLoading = false;
@@ -221,6 +215,7 @@ public class MainActivity extends AppCompatActivity {
                     if(page > 1) {
                         mApiAdapter.addMovies(movies);
                     } else {
+                        mPreviousTotal = 0;
                         mApiAdapter = new ApiAdapter(getApplicationContext(), movies);
                         mRecyclerView.setAdapter(mApiAdapter);
                         mRecyclerView.smoothScrollToPosition(0);
@@ -264,6 +259,7 @@ public class MainActivity extends AppCompatActivity {
                     if(page > 1) {
                         mApiAdapter.addMovies(movies);
                     } else {
+                        mPreviousTotal = 0;
                         mApiAdapter = new ApiAdapter(getApplicationContext(), movies);
                         mRecyclerView.setAdapter(mApiAdapter);
                         mRecyclerView.smoothScrollToPosition(0);

@@ -23,7 +23,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.view.MenuItemCompat;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -57,7 +56,6 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
     ProgressDialog mProgressDialog;
     private SwipeRefreshLayout mSwipeLayout;
     private GridLayoutManager mLayoutManager;
-
     private String mSearchString;
     private int mPreviousTotal = 0, mVisibleThreshold = 5;
     int mFirstVisibleItem, mVisibleItemCount, mTotalItemCount, mCurrentPage;
@@ -76,51 +74,39 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
         setProgressDialog();
         setRecyclerView();
 
-        if(savedInstanceState != null) {
-            mSearchMode = savedInstanceState.getBoolean(SEARCH_MODE);
-
-            if(mSearchMode) {
-                MenuItem search = findViewById(R.id.action_search);
-                onOptionsItemSelected(search);
-            }
-        }
-
-        // load movies from api
-        mApiAdapter = new ApiAdapter(getApplicationContext(), new ArrayList<Movie>());
         loadFilmList("", 1, false);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.item2:
+            case R.id.action_filter:
                 Toast.makeText(this, "Preferiti", Toast.LENGTH_SHORT).show();
                 mPreviousTotal = 0;
                 loadFavourite();
                 mSwipeLayout.setEnabled(false);
                 return true;
-            case R.id.item3:
-                Toast.makeText(this, "Tutti", Toast.LENGTH_SHORT).show();
-                mPreviousTotal = 0;
-                loadFilmList("", 1,false);
-                mSwipeLayout.setEnabled(true);
-                return true;
+            //case R.id.item3:
+            //    Toast.makeText(this, "Tutti", Toast.LENGTH_SHORT).show();
+            //    mPreviousTotal = 0;
+            //    loadFilmList("", 1, false);
+            //    mSwipeLayout.setEnabled(true);
+            //    return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
-
     }
 
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
-        final MenuItem filterItem = menu.findItem(R.id.action_filter);
         final MenuItem searchItem = menu.findItem(R.id.action_search);
+        final MenuItem filterItem = menu.findItem(R.id.action_filter);
         final SearchView searchView = (SearchView) searchItem.getActionView();
         searchView.setImeOptions(EditorInfo.IME_ACTION_DONE);
 
-        MenuItemCompat.setOnActionExpandListener(searchItem, new MenuItemCompat.OnActionExpandListener() {
+        searchItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
             @Override
             public boolean onMenuItemActionExpand(MenuItem item) {
                 Log.d(TAG, "onMenuItemActionExpand: ");
@@ -162,7 +148,6 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
                 return false;
             }
         });
-
         return true;
     }
 
@@ -267,7 +252,7 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
     /******* DATA LOADING *******/
 
     private void loadFilmList(String s, final int page, final Boolean isSearch) {
-        final String ms = s;
+        final String myString = s;
         try {
             checkApiKey();
             Call<MoviesResponse> call;
@@ -309,7 +294,7 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
                     Log.d(TAG, "onFailure: " + t.getMessage());
                     Toast.makeText(MainActivity.this, "Server non raggiungibile", Toast.LENGTH_SHORT).show();
                     if (isSearch) {
-                        final Cursor cursor = getContentResolver().query(Provider.FILMS_URI, null, TableHelper.TITLE + " LIKE \'%" + ms + "%\'", null, null, null);
+                        final Cursor cursor = getContentResolver().query(Provider.FILMS_URI, null, TableHelper.TITLE + " LIKE \'%" + myString + "%\'", null, null, null);
                         mRecyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), cursor));
                         mRecyclerView.smoothScrollToPosition(0);
                     } else {
@@ -331,14 +316,14 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
         mRecyclerView.smoothScrollToPosition(0);
     }
 
-    private void loadFavourite(){
+    private void loadFavourite() {
         Cursor cursorPreferiti = getContentResolver().query(Provider.PREFERITI_URI, null, null, null, null, null);
         String idList = "";
-        for(int i = 0; i< cursorPreferiti.getCount(); i++){
+        for (int i = 0; i < cursorPreferiti.getCount(); i++) {
             cursorPreferiti.moveToNext();
             idList += cursorPreferiti.getInt(cursorPreferiti.getColumnIndex(PreferitiTableHelper._ID)) + ", ";
         }
-        if(idList.length()>2) {
+        if (idList.length() > 2) {
             idList = idList.substring(0, idList.length() - 2);
         }
         Cursor cursorResult = getContentResolver().query(Provider.FILMS_URI, null, TableHelper._ID + " IN(" + idList + ")", null, null, null);

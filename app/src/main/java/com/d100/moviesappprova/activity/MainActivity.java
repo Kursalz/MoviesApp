@@ -290,7 +290,9 @@ public class MainActivity extends AppCompatActivity {
             cursorPreferiti.moveToNext();
             idList += cursorPreferiti.getInt(cursorPreferiti.getColumnIndex(PreferitiTableHelper._ID)) + ", ";
         }
-        idList = idList.substring(0,idList.length()-2);
+        if(idList.length()>2) {
+            idList = idList.substring(0, idList.length() - 2);
+        }
         Cursor cursorResult = getContentResolver().query(Provider.FILMS_URI, null, TableHelper._ID + " IN(" + idList + ")", null, null, null);
         mRecyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), cursorResult));
         mRecyclerView.smoothScrollToPosition(0);

@@ -96,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
                 mSwipeLayout.setEnabled(false);
                 searchView.onActionViewExpanded();
                 mSearchMode = true;
+                mPreviousTotal = 0;
                 return true;
             }
 
@@ -104,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
                 hideKeyboard(MainActivity.this);
                 mSwipeLayout.setEnabled(true);
                 mSearchMode = false;
+                mPreviousTotal = 0;
                 loadJSON(1);
                 return true;
             }
@@ -173,6 +175,8 @@ public class MainActivity extends AppCompatActivity {
                 mFirstVisibleItem = mLayoutManager.findFirstVisibleItemPosition();
 
                 if (dy > 0) {
+                    hideKeyboard(MainActivity.this);
+
                     if (mLoading) {
                         if (mTotalItemCount > mPreviousTotal) {
                             mLoading = false;
@@ -228,7 +232,9 @@ public class MainActivity extends AppCompatActivity {
                 public void onFailure(Call<MoviesResponse> call, Throwable t) {
                     Log.d(TAG, "onFailure: " + t.getMessage());
                     Toast.makeText(MainActivity.this, "Server non raggiungibile", Toast.LENGTH_SHORT).show();
-                    loadDb();
+                    if(mPreviousTotal == 0) {
+                        loadDb();
+                    }
                 }
             });
         } catch (Exception e) {

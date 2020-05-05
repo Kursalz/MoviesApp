@@ -57,6 +57,7 @@ public class ApiAdapter extends RecyclerView.Adapter<ApiAdapter.MyViewHolder> {
         public static final String OVERVIEW = "overview";
         public static final String VOTE_AVERAGE = "vote_average";
         public static final String RELEASE_DATE = "release_date";
+        public static final String _ID = "_id";
         public ImageView thumbnail;
 
         public MyViewHolder(@NonNull View itemView) {
@@ -77,7 +78,7 @@ public class ApiAdapter extends RecyclerView.Adapter<ApiAdapter.MyViewHolder> {
                         vIntent.putExtra(OVERVIEW, vMovie.getOverview());
                         vIntent.putExtra(VOTE_AVERAGE, vMovie.getVote_average());
                         vIntent.putExtra(RELEASE_DATE, vMovie.getRelease_date());
-
+                        vIntent.putExtra(_ID, vMovie.getId());
                         vIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         mContext.startActivity(vIntent);
                     }

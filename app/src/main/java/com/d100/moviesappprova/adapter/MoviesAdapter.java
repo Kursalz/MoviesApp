@@ -53,6 +53,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MyViewHold
         public static final String OVERVIEW = "overview";
         public static final String VOTE_AVERAGE = "vote_average";
         public static final String RELEASE_DATE = "release_date";
+        public static final String _ID = "_id";
         public ImageView thumbnail;
 
         public MyViewHolder(@NonNull View itemView) {
@@ -71,6 +72,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MyViewHold
                         vIntent.putExtra(OVERVIEW, mCursor.getString(mCursor.getColumnIndex(TableHelper.OVERVIEW)));
                         vIntent.putExtra(VOTE_AVERAGE, mCursor.getString(mCursor.getColumnIndex(TableHelper.VOTE_AVERAGE)));
                         vIntent.putExtra(RELEASE_DATE, mCursor.getString(mCursor.getColumnIndex(TableHelper.RELEASE_DATE)));
+                        vIntent.putExtra(_ID, mCursor.getInt(mCursor.getColumnIndex(TableHelper._ID)));
                         vIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         mContext.startActivity(vIntent);
                     }

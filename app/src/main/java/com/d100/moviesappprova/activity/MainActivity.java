@@ -176,7 +176,6 @@ public class MainActivity extends AppCompatActivity {
 
                 if (dy > 0) {
                     hideKeyboard(MainActivity.this);
-
                     if (mLoading) {
                         if (mTotalItemCount > mPreviousTotal) {
                             mLoading = false;
@@ -216,7 +215,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                     mProgressDialog.dismiss();
 
-                    if(page > 1) {
+                    if (page > 1) {
                         mApiAdapter.addMovies(movies);
                     } else {
                         mPreviousTotal = 0;
@@ -232,7 +231,7 @@ public class MainActivity extends AppCompatActivity {
                 public void onFailure(Call<MoviesResponse> call, Throwable t) {
                     Log.d(TAG, "onFailure: " + t.getMessage());
                     Toast.makeText(MainActivity.this, "Server non raggiungibile", Toast.LENGTH_SHORT).show();
-                    if(mPreviousTotal == 0) {
+                    if (mPreviousTotal == 0) {
                         loadDb();
                     }
                 }
@@ -256,13 +255,13 @@ public class MainActivity extends AppCompatActivity {
                 public void onResponse(Call<MoviesResponse> call, Response<MoviesResponse> response) {
                     List<Movie> movies;
 
-                    if(response.body() == null) {
+                    if (response.body() == null) {
                         movies = new ArrayList<>();
                     } else {
                         movies = response.body().getResults();
                     }
 
-                    if(page > 1) {
+                    if (page > 1) {
                         mApiAdapter.addMovies(movies);
                     } else {
                         mPreviousTotal = 0;

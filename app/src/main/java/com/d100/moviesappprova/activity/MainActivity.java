@@ -30,6 +30,7 @@ import com.d100.moviesappprova.adapter.ApiAdapter;
 import com.d100.moviesappprova.adapter.MoviesAdapter;
 import com.d100.moviesappprova.api.Client;
 import com.d100.moviesappprova.api.Service;
+import com.d100.moviesappprova.data.PreferitiTableHelper;
 import com.d100.moviesappprova.data.Provider;
 import com.d100.moviesappprova.data.TableHelper;
 import com.d100.moviesappprova.model.Movie;
@@ -77,14 +78,33 @@ public class MainActivity extends AppCompatActivity {
 
         // load movies from api
         mApiAdapter = new ApiAdapter(getApplicationContext(), new ArrayList<Movie>());
-        loadJSON(1);
+        loadFilmList("", 1, false);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.item2:
+                Toast.makeText(this, "Preferiti", Toast.LENGTH_SHORT).show();
+                loadFavourite();
+                mSwipeLayout.setEnabled(false);
+                return true;
+            case R.id.item3:
+                Toast.makeText(this, "Tutti", Toast.LENGTH_SHORT).show();
+                loadFilmList("", 1,false);
+                mSwipeLayout.setEnabled(true);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+
     }
 
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
-
+        final MenuItem filterItem = menu.findItem(R.id.action_filter);
         final MenuItem searchItem = menu.findItem(R.id.action_search);
         final SearchView searchView = (SearchView) searchItem.getActionView();
         searchView.setImeOptions(EditorInfo.IME_ACTION_DONE);
@@ -106,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
                 mSwipeLayout.setEnabled(true);
                 mSearchMode = false;
                 mPreviousTotal = 0;
-                loadJSON(1);
+                loadFilmList("", 1, false);
                 return true;
             }
         });
@@ -115,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onQueryTextSubmit(String s) {
                 mSearchString = s;
-                search(s, 1);
+                loadFilmList(s, 1, true);
                 searchView.clearFocus();
 
                 return false;
@@ -124,11 +144,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onQueryTextChange(String s) {
                 mSearchString = s;
-                search(s, 1);
+                loadFilmList(s, 1, true);
 
                 return false;
             }
         });
+
         return true;
     }
 
@@ -149,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onRefresh() {
                 Toast.makeText(MainActivity.this, "Movies refreshed", Toast.LENGTH_SHORT).show();
-                loadJSON(1);
+                loadFilmList("", 1, false);
                 mSwipeLayout.setRefreshing(false);
             }
         });
@@ -185,9 +206,9 @@ public class MainActivity extends AppCompatActivity {
 
                     if (!mLoading && (mTotalItemCount - mVisibleItemCount) <= (mFirstVisibleItem + mVisibleThreshold)) {
                         if (!mSearchMode) {
-                            loadJSON(mCurrentPage + 1);
+                            loadFilmList("", mCurrentPage + 1, false);
                         } else {
-                            search(mSearchString, mCurrentPage + 1);
+                            loadFilmList(mSearchString, mCurrentPage + 1, true);
                         }
                         mLoading = true;
                         Log.d(TAG, "onScrolled: end of scroll");
@@ -197,17 +218,26 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void loadJSON(final int page) {
+    private void loadFilmList(String s, final int page, final Boolean isSearch) {
+        final String ms = s;
         try {
             checkApiKey();
-
+            Call<MoviesResponse> call;
             final Service vApiService = Client.getClient().create(Service.class);
-            Call<MoviesResponse> call = vApiService.getPopularMovies(getString(R.string.api_key), page);
-
+            if (isSearch) {
+                call = vApiService.getMoviesByTitle(getString(R.string.api_key), s, page);
+            } else {
+                call = vApiService.getPopularMovies(getString(R.string.api_key), page);
+            }
             call.enqueue(new Callback<MoviesResponse>() {
                 @Override
                 public void onResponse(Call<MoviesResponse> call, Response<MoviesResponse> response) {
-                    List<Movie> movies = response.body().getResults();
+                    List<Movie> movies;
+                    if (response.body() == null) {
+                        movies = new ArrayList<>();
+                    } else {
+                        movies = response.body().getResults();
+                    }
                     ContentResolver resolver = getContentResolver();
 
                     for (int i = 0; i < movies.size(); i++) {
@@ -223,7 +253,6 @@ public class MainActivity extends AppCompatActivity {
                         mRecyclerView.setAdapter(mApiAdapter);
                         mRecyclerView.smoothScrollToPosition(0);
                     }
-
                     mCurrentPage = page;
                 }
 
@@ -231,8 +260,14 @@ public class MainActivity extends AppCompatActivity {
                 public void onFailure(Call<MoviesResponse> call, Throwable t) {
                     Log.d(TAG, "onFailure: " + t.getMessage());
                     Toast.makeText(MainActivity.this, "Server non raggiungibile", Toast.LENGTH_SHORT).show();
-                    if (mPreviousTotal == 0) {
-                        loadDb();
+                    if (isSearch) {
+                        final Cursor cursor = getContentResolver().query(Provider.FILMS_URI, null, TableHelper.TITLE + " LIKE \'%" + ms + "%\'", null, null, null);
+                        mRecyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), cursor));
+                        mRecyclerView.smoothScrollToPosition(0);
+                    } else {
+                        if (mPreviousTotal == 0) {
+                            loadDb();
+                        }
                     }
                 }
             });
@@ -242,56 +277,22 @@ public class MainActivity extends AppCompatActivity {
         mProgressDialog.dismiss();
     }
 
-    private void search(String s, final int page) {
-        final String ms = s;
-        try {
-            checkApiKey();
-
-            Service vApiService = Client.getClient().create(Service.class);
-            Call<MoviesResponse> call = vApiService.getMoviesByTitle(getString(R.string.api_key), s, page);
-
-            call.enqueue(new Callback<MoviesResponse>() {
-                @Override
-                public void onResponse(Call<MoviesResponse> call, Response<MoviesResponse> response) {
-                    List<Movie> movies;
-
-                    if (response.body() == null) {
-                        movies = new ArrayList<>();
-                    } else {
-                        movies = response.body().getResults();
-                    }
-
-                    if (page > 1) {
-                        mApiAdapter.addMovies(movies);
-                    } else {
-                        mPreviousTotal = 0;
-                        mApiAdapter = new ApiAdapter(getApplicationContext(), movies);
-                        mRecyclerView.setAdapter(mApiAdapter);
-                        mRecyclerView.smoothScrollToPosition(0);
-                    }
-
-                    mCurrentPage = page;
-                }
-
-                @Override
-                public void onFailure(Call<MoviesResponse> call, Throwable t) {
-                    Log.d(TAG, "onFailure search: " + t.getMessage());
-                    Toast.makeText(MainActivity.this, "Server non raggiungibile", Toast.LENGTH_SHORT).show();
-                    final Cursor cursor = getContentResolver().query(Provider.FILMS_URI, null, TableHelper.TITLE + " LIKE \'%" + ms + "%\'", null, null, null);
-                    mRecyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), cursor));
-                    mRecyclerView.smoothScrollToPosition(0);
-                }
-            });
-
-        } catch (Exception e) {
-            Log.d(TAG, "onQueryTextSubmit: exception: " + e.getMessage());
-        }
-
-    }
-
     private void loadDb() {
         Cursor cursor = getContentResolver().query(Provider.FILMS_URI, null, null, null, null, null);
         mRecyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), cursor));
+        mRecyclerView.smoothScrollToPosition(0);
+    }
+
+    private void loadFavourite(){
+        Cursor cursorPreferiti = getContentResolver().query(Provider.PREFERITI_URI, null, null, null, null, null);
+        String idList = "";
+        for(int i = 0; i< cursorPreferiti.getCount(); i++){
+            cursorPreferiti.moveToNext();
+            idList += cursorPreferiti.getInt(cursorPreferiti.getColumnIndex(PreferitiTableHelper._ID)) + ", ";
+        }
+        idList = idList.substring(0,idList.length()-2);
+        Cursor cursorResult = getContentResolver().query(Provider.FILMS_URI, null, TableHelper._ID + " IN(" + idList + ")", null, null, null);
+        mRecyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), cursorResult));
         mRecyclerView.smoothScrollToPosition(0);
     }
 

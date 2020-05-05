@@ -6,11 +6,14 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.res.Configuration;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -18,6 +21,7 @@ import android.widget.SearchView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.MenuItemCompat;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -33,6 +37,7 @@ import com.d100.moviesappprova.api.Service;
 import com.d100.moviesappprova.data.PreferitiTableHelper;
 import com.d100.moviesappprova.data.Provider;
 import com.d100.moviesappprova.data.TableHelper;
+import com.d100.moviesappprova.fragment.MyDialogFragment;
 import com.d100.moviesappprova.model.Movie;
 import com.d100.moviesappprova.model.MoviesResponse;
 
@@ -43,22 +48,23 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MyDialogFragment.DialogFragmentInterface {
     public static final String TAG = "tagMainActivity";
+    private static final String SEARCH_MODE = "search_mode";
 
     private RecyclerView mRecyclerView;
-    private MoviesAdapter mAdapter;
     private ApiAdapter mApiAdapter;
     ProgressDialog mProgressDialog;
     private SwipeRefreshLayout mSwipeLayout;
     private GridLayoutManager mLayoutManager;
 
-    private List<Movie> mListMovies;
-
     private String mSearchString;
     private int mPreviousTotal = 0, mVisibleThreshold = 5;
     int mFirstVisibleItem, mVisibleItemCount, mTotalItemCount, mCurrentPage;
     private boolean mLoading = true, mSearchMode = false;
+
+
+    /******* OVERRIDES *******/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,11 +76,14 @@ public class MainActivity extends AppCompatActivity {
         setProgressDialog();
         setRecyclerView();
 
-        // get movies from internal database and load into recyclerview
-        Cursor cursor = getContentResolver().query(Provider.FILMS_URI, null, null, null, null, null);
-        mAdapter = new MoviesAdapter(getApplicationContext(), cursor);
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        mRecyclerView.setAdapter(mAdapter);
+        if(savedInstanceState != null) {
+            mSearchMode = savedInstanceState.getBoolean(SEARCH_MODE);
+
+            if(mSearchMode) {
+                MenuItem search = findViewById(R.id.action_search);
+                onOptionsItemSelected(search);
+            }
+        }
 
         // load movies from api
         mApiAdapter = new ApiAdapter(getApplicationContext(), new ArrayList<Movie>());
@@ -86,11 +95,13 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.item2:
                 Toast.makeText(this, "Preferiti", Toast.LENGTH_SHORT).show();
+                mPreviousTotal = 0;
                 loadFavourite();
                 mSwipeLayout.setEnabled(false);
                 return true;
             case R.id.item3:
                 Toast.makeText(this, "Tutti", Toast.LENGTH_SHORT).show();
+                mPreviousTotal = 0;
                 loadFilmList("", 1,false);
                 mSwipeLayout.setEnabled(true);
                 return true;
@@ -112,6 +123,7 @@ public class MainActivity extends AppCompatActivity {
         MenuItemCompat.setOnActionExpandListener(searchItem, new MenuItemCompat.OnActionExpandListener() {
             @Override
             public boolean onMenuItemActionExpand(MenuItem item) {
+                Log.d(TAG, "onMenuItemActionExpand: ");
                 searchView.onActionViewCollapsed();
                 mSwipeLayout.setEnabled(false);
                 searchView.onActionViewExpanded();
@@ -122,6 +134,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public boolean onMenuItemActionCollapse(MenuItem item) {
+                Log.d(TAG, "onMenuItemActionCollapse: ");
                 hideKeyboard(MainActivity.this);
                 mSwipeLayout.setEnabled(true);
                 mSearchMode = false;
@@ -152,6 +165,38 @@ public class MainActivity extends AppCompatActivity {
 
         return true;
     }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putBoolean(SEARCH_MODE, mSearchMode);
+    }
+
+
+    /******* OVERRIDE INTERFACE *******/
+
+    @Override
+    public void onResponse(boolean aResponse, long aId, boolean aIsDelete) {
+        if(aResponse) {
+            if(aIsDelete) {
+                int vDeletedRows = getContentResolver().delete(Uri.parse(Provider.PREFERITI_URI + "/" + aId), null, null);
+                if(vDeletedRows > 0) {
+                    Toast.makeText(this, "Film rimosso dalla lista preferiti", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(this, "Errore rimozione film", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                ContentValues content = new ContentValues();
+                content.put(PreferitiTableHelper._ID, aId);
+                getContentResolver().insert(Provider.PREFERITI_URI, content);
+                Toast.makeText(this, "Film inserito nella lista preferiti", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+
+    /******* VIEW INITS *******/
 
     private void setProgressDialog() {
         mProgressDialog = new ProgressDialog(this);
@@ -217,6 +262,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+
+    /******* DATA LOADING *******/
 
     private void loadFilmList(String s, final int page, final Boolean isSearch) {
         final String ms = s;
@@ -298,6 +346,9 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView.smoothScrollToPosition(0);
     }
 
+
+    /******* MISC *******/
+
     private ContentValues createContentValues(Movie movie) {
         ContentValues content = new ContentValues();
 
@@ -334,5 +385,4 @@ public class MainActivity extends AppCompatActivity {
         }
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
-
 }

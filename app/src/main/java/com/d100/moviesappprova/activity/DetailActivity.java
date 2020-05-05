@@ -73,7 +73,7 @@ public class DetailActivity extends AppCompatActivity {
             mTxtUserRating.setText(rating);
             mTxtReleaseDate.setText(releaseDate);
 
-            Cursor cursor = getContentResolver().query(Provider.PREFERITI_URI, null, PreferitiTableHelper._ID + " = \'" + movieId + "\'", null, null, null);
+            Cursor cursor = getContentResolver().query(Uri.parse(Provider.PREFERITI_URI + "/" + movieId), null, null, null, null, null);
             if (cursor.getCount() > 0) {
                 isFavourite = true;
                 mBtnFavourite.setImageDrawable(getDrawable(R.drawable.star_true));

@@ -2,20 +2,30 @@ package com.d100.moviesappprova.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.d100.moviesappprova.R;
 import com.d100.moviesappprova.activity.DetailActivity;
+import com.d100.moviesappprova.activity.MainActivity;
+import com.d100.moviesappprova.data.Provider;
+import com.d100.moviesappprova.data.TableHelper;
+import com.d100.moviesappprova.fragment.MyDialogFragment;
 import com.d100.moviesappprova.model.Movie;
 
 import java.util.List;
+
+import static com.d100.moviesappprova.activity.MainActivity.TAG;
 
 public class ApiAdapter extends RecyclerView.Adapter<ApiAdapter.MyViewHolder> {
     private Context mContext;
@@ -82,6 +92,29 @@ public class ApiAdapter extends RecyclerView.Adapter<ApiAdapter.MyViewHolder> {
                         vIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         mContext.startActivity(vIntent);
                     }
+                }
+            });
+
+            itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    int vPosition = getAdapterPosition();
+                    Movie vMovie = mListMovies.get(vPosition);
+                    int vIdMovie = vMovie.getId();
+
+                    Cursor vCursor = mContext.getContentResolver().query(Uri.parse(Provider.PREFERITI_URI + "/" + vIdMovie), null, null, null, null, null);
+                    MyDialogFragment vFragment;
+
+                    if(vCursor.getCount() > 0) {
+                        vFragment = new MyDialogFragment("Preferiti", "Questo film è già fra i tuoi preferiti. Vuoi rimuoverlo?", vIdMovie, true);
+                    } else {
+                        vFragment = new MyDialogFragment("Preferiti", "Vuoi aggiungere questo film ai tuoi preferiti?", vIdMovie, false);
+                    }
+
+                    AppCompatActivity vActivity = (AppCompatActivity) view.getContext();
+                    vFragment.show(vActivity.getSupportFragmentManager(), null);
+
+                    return true;
                 }
             });
         }

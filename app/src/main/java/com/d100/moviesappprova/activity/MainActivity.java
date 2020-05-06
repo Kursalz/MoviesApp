@@ -193,10 +193,10 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
 
     @Override
     public void onResponse(boolean aResponse, long aId, boolean aIsDelete) {
-        if(aResponse) {
-            if(aIsDelete) {
+        if (aResponse) {
+            if (aIsDelete) {
                 int vDeletedRows = getContentResolver().delete(Uri.parse(Provider.PREFERITI_URI + "/" + aId), null, null);
-                if(vDeletedRows > 0) {
+                if (vDeletedRows > 0) {
                     Toast.makeText(this, "Film rimosso dalla lista preferiti", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(this, "Errore rimozione film", Toast.LENGTH_SHORT).show();
@@ -303,7 +303,7 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
                     }
                     ContentResolver resolver = getContentResolver();
 
-                    for (int i = 0; i < movies.size(); i++) {
+                    for (int i = 0; i < movies.size() && page == 1; i++) {
                         resolver.insert(Provider.FILMS_URI, createContentValues(movies.get(i)));
                     }
                     mProgressDialog.dismiss();

@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
@@ -20,11 +21,19 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.d100.moviesappprova.R;
 import com.d100.moviesappprova.adapter.MoviesAdapter.MyViewHolder;
+import com.d100.moviesappprova.api.Client;
+import com.d100.moviesappprova.api.Service;
 import com.d100.moviesappprova.data.PreferitiTableHelper;
 import com.d100.moviesappprova.data.Provider;
 import com.d100.moviesappprova.data.TableHelper;
+import com.d100.moviesappprova.model.Movie;
+import com.d100.moviesappprova.model.MoviesResponse;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class DetailActivity extends AppCompatActivity {
     TextView mTxtMovieName, mTxtSynopsis, mTxtUserRating, mTxtReleaseDate;
@@ -143,6 +152,55 @@ public class DetailActivity extends AppCompatActivity {
             getContentResolver().insert(Provider.PREFERITI_URI, content);
             btn.setImageDrawable(getDrawable(R.drawable.star_true));
             isFavourite = true;
+            getFilm(movieId);
         }
+    }
+
+    private void getFilm(int id) {
+        try {
+            if (getString(R.string.api_key).isEmpty()) { //BuildConfig.THE_MOVIE_DB_API_TOKEN
+                Toast.makeText(this, "Please obtain api key", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            Call<Movie> call;
+            final Service vApiService = Client.getClient().create(Service.class);
+            call = vApiService.getMovieDetail(id, getString(R.string.api_key));
+            call.enqueue(new Callback<Movie>() {
+                @Override
+                public void onResponse(Call<Movie> call, Response<Movie> response) {
+                    if (response.body() != null) {
+                        ContentResolver resolver = getContentResolver();
+                        resolver.insert(Provider.FILMS_URI, createContentValues(response.body()));
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Movie> call, Throwable t) {
+                    Log.d(TAG, "onFailure: " + t.getMessage());
+                }
+            });
+        } catch (Exception e) {
+            Log.d(TAG, "loadJSON: " + e.getMessage());
+        }
+    }
+
+    private ContentValues createContentValues(Movie movie) {
+        ContentValues content = new ContentValues();
+
+        content.put(TableHelper._ID, movie.getId());
+        content.put(TableHelper.POSTER_PATH, movie.getPoster_path());
+        content.put(TableHelper.ADULT, movie.isAdult());
+        content.put(TableHelper.OVERVIEW, movie.getOverview());
+        content.put(TableHelper.RELEASE_DATE, movie.getRelease_date());
+        content.put(TableHelper.ORIGINAL_TITLE, movie.getTitle());
+        content.put(TableHelper.ORIGINAL_LANGUAGE, movie.getOriginal_language());
+        content.put(TableHelper.TITLE, movie.getTitle());
+        content.put(TableHelper.BACKDROP_PATH, movie.getBackdrop_path());
+        content.put(TableHelper.POPULARITY, movie.getPopularity());
+        content.put(TableHelper.VOTE_COUNT, movie.getVote_count());
+        content.put(TableHelper.VIDEO, movie.isVideo());
+        content.put(TableHelper.VOTE_AVERAGE, movie.getVote_average());
+
+        return content;
     }
 }

@@ -50,13 +50,14 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity implements MyDialogFragment.DialogFragmentInterface {
     public static final String TAG = "tagMainActivity";
     private static final String SEARCH_MODE = "search_mode";
+    private static final String SEARCH_TEXT = "search_text";
 
     private RecyclerView mRecyclerView;
     private ApiAdapter mApiAdapter;
     ProgressDialog mProgressDialog;
     private SwipeRefreshLayout mSwipeLayout;
     private GridLayoutManager mLayoutManager;
-    private String mSearchString;
+    private String mSearchString = "";
     private int mPreviousTotal = 0, mVisibleThreshold = 5;
     int mFirstVisibleItem, mVisibleItemCount, mTotalItemCount, mCurrentPage;
     private boolean mLoading = true, mSearchMode = false;
@@ -67,6 +68,8 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Log.d(TAG, "onCreate: ");
         setContentView(R.layout.activity_main);
 
         setViews();
@@ -74,7 +77,15 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
         setProgressDialog();
         setRecyclerView();
 
-        loadFilmList("", 1, false);
+        if(savedInstanceState != null) {
+            mSearchMode = savedInstanceState.getBoolean(SEARCH_MODE);
+
+            if(mSearchMode) {
+                mSearchString = savedInstanceState.getString(SEARCH_TEXT);
+            }
+        }
+
+        loadFilmList(mSearchString, 1, mSearchMode);
     }
 
     @Override
@@ -99,8 +110,11 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
 
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
+        Log.d(TAG, "onCreateOptionsMenu: ");
+        
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
+
         final MenuItem searchItem = menu.findItem(R.id.action_search);
         final MenuItem filterItem = menu.findItem(R.id.action_filter);
         final SearchView searchView = (SearchView) searchItem.getActionView();
@@ -110,9 +124,13 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
             @Override
             public boolean onMenuItemActionExpand(MenuItem item) {
                 Log.d(TAG, "onMenuItemActionExpand: ");
+                String text = mSearchString;
+
                 searchView.onActionViewCollapsed();
                 mSwipeLayout.setEnabled(false);
                 searchView.onActionViewExpanded();
+
+                mSearchString = text;
                 mSearchMode = true;
                 mPreviousTotal = 0;
                 return true;
@@ -125,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
                 mSwipeLayout.setEnabled(true);
                 mSearchMode = false;
                 mPreviousTotal = 0;
-                loadFilmList("", 1, false);
+                loadFilmList(mSearchString, 1, false);
                 return true;
             }
         });
@@ -148,6 +166,16 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
                 return false;
             }
         });
+
+        if(mSearchMode) {
+            searchItem.expandActionView();
+            searchView.post(new Runnable() {
+                @Override
+                public void run() {
+                    searchView.setQuery(mSearchString, true);
+                }
+            });
+        }
         return true;
     }
 
@@ -155,9 +183,11 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
+        Log.d(TAG, "onSaveInstanceState: ");
+        
         outState.putBoolean(SEARCH_MODE, mSearchMode);
+        outState.putString(SEARCH_TEXT, mSearchString);
     }
-
 
     /******* OVERRIDE INTERFACE *******/
 

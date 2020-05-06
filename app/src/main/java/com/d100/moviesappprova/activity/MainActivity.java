@@ -6,6 +6,7 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.res.Configuration;
 import android.database.Cursor;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.PersistableBundle;
@@ -15,6 +16,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.SearchView;
@@ -23,6 +26,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -67,6 +71,7 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
     private GridLayoutManager mLayoutManager;
 
     private String mSearchString = "";
+    private Toolbar mToolbar;
     private int mPreviousTotal = 0, mVisibleThreshold = 5;
     private int mFirstVisibleItem, mVisibleItemCount, mTotalItemCount, mCurrentPage;
     private boolean mLoading = true;
@@ -77,10 +82,8 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         Log.d(TAG, "onCreate: ");
         setContentView(R.layout.activity_main);
-
         setViews();
         setListeners();
         setProgressDialog();
@@ -104,6 +107,11 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
                     case FAVOURITES:
                         Toast.makeText(this, "Popular", Toast.LENGTH_SHORT).show();
                         mPreviousTotal = 0;
+                        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.colorPrimary)));
+                        getSupportActionBar().setTitle("Movies");
+                        Window window = getWindow();
+                        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                        window.setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark));
                         mStatus = Status.POPULAR;
                         loadFilmList("", 1);
                         mSwipeLayout.setEnabled(true);
@@ -112,14 +120,16 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
                     default:
                         Toast.makeText(this, "Preferiti", Toast.LENGTH_SHORT).show();
                         mPreviousTotal = 0;
+                        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.favourite)));
+                        getSupportActionBar().setTitle("Preferiti");
+                        window = getWindow();
+                        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                        window.setStatusBarColor(getResources().getColor(R.color.favouriteDark));
                         mStatus = Status.FAVOURITES;
                         loadFavourite();
                         mSwipeLayout.setEnabled(false);
                         break;
                 }
-
-                return true;
-
             //case R.id.item3:
             //    Toast.makeText(this, "Tutti", Toast.LENGTH_SHORT).show();
             //    mPreviousTotal = 0;
@@ -255,6 +265,7 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
     private void setViews() {
         mSwipeLayout = findViewById(R.id.swipe_layout);
         mRecyclerView = findViewById(R.id.recycler_view);
+        mToolbar = findViewById(R.id.toolbar);
     }
 
     private void setListeners() {

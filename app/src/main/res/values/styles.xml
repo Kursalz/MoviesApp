@@ -12,7 +12,10 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
-
+    <style name="RatingBar" parent="Theme.AppCompat">
+        <item name="colorControlNormal">@color/favourite</item>
+        <item name="colorControlActivated">@color/favouriteDark</item>
+    </style>
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
     <style name="AppTheme.PopularOverlay" parent="Theme.AppCompat.Light"/>
 </resources>

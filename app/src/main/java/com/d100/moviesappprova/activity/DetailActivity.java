@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,7 +28,6 @@ import com.d100.moviesappprova.data.PreferitiTableHelper;
 import com.d100.moviesappprova.data.Provider;
 import com.d100.moviesappprova.data.TableHelper;
 import com.d100.moviesappprova.model.Movie;
-import com.d100.moviesappprova.model.MoviesResponse;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 
@@ -36,10 +36,12 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class DetailActivity extends AppCompatActivity {
-    TextView mTxtMovieName, mTxtSynopsis, mTxtUserRating, mTxtReleaseDate;
+    TextView mTxtMovieName, mTxtSynopsis, mTxtReleaseDate;
+    RatingBar mUserRating;
     ImageView mImageView;
     ImageButton mBtnFavourite;
     AppBarLayout mAppBarLayout;
+    Toolbar mToolbar;
     private String TAG = "tagDetailActivity";
     Boolean isFavourite;
     int movieId;
@@ -48,19 +50,17 @@ public class DetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
-
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        mToolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("");
-
         initCollapsingToolbar();
 
         mBtnFavourite = findViewById(R.id.btnFavourite);
         mImageView = findViewById(R.id.thumbnail_image_header);
         mTxtMovieName = findViewById(R.id.title);
         mTxtSynopsis = findViewById(R.id.plotsynopsis);
-        mTxtUserRating = findViewById(R.id.userrating);
+        mUserRating = findViewById(R.id.userrating);
         mTxtReleaseDate = findViewById(R.id.releasedate);
 
 
@@ -69,7 +69,7 @@ public class DetailActivity extends AppCompatActivity {
             String thumbnail = vStartingIntent.getExtras().getString(MyViewHolder.BACKDROP_PATH);
             String movieName = vStartingIntent.getExtras().getString(MyViewHolder.ORIGINAL_TITLE);
             String synopsis = vStartingIntent.getExtras().getString(MyViewHolder.OVERVIEW);
-            String rating = vStartingIntent.getExtras().getString(MyViewHolder.VOTE_AVERAGE);
+            double rating = vStartingIntent.getExtras().getDouble(MyViewHolder.VOTE_AVERAGE);
             String releaseDate = vStartingIntent.getExtras().getString(MyViewHolder.RELEASE_DATE);
             movieId = vStartingIntent.getExtras().getInt(MyViewHolder._ID);
             Glide.with(this)
@@ -79,7 +79,9 @@ public class DetailActivity extends AppCompatActivity {
 
             mTxtMovieName.setText(movieName);
             mTxtSynopsis.setText(synopsis);
-            mTxtUserRating.setText(rating);
+            mUserRating.setMax(10);
+            mUserRating.setEnabled(false);
+            mUserRating.setRating((float)rating);
             mTxtReleaseDate.setText(releaseDate);
 
             Cursor cursor = getContentResolver().query(Uri.parse(Provider.PREFERITI_URI + "/" + movieId), null, null, null, null);

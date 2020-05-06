@@ -17,7 +17,7 @@ public class Movie {
     private Double popularity;
     private int vote_count;
     private boolean video;
-    private Double vote_average;
+    private double vote_average;
 
     private final String mBaseImageUrl= "https://image.tmdb.org/t/p/w500";
 
@@ -143,11 +143,11 @@ public class Movie {
         this.video = video;
     }
 
-    public Double getVote_average() {
+    public double getVote_average() {
         return vote_average;
     }
 
-    public void setVote_average(Double vote_average) {
+    public void setVote_average(double vote_average) {
         this.vote_average = vote_average;
     }
 }

@@ -89,9 +89,9 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
         setProgressDialog();
         setRecyclerView();
 
-        if(savedInstanceState != null) {
+        if (savedInstanceState != null) {
             mStatus = (Status) savedInstanceState.getSerializable(STATUS);
-            if(mStatus == Status.SEARCH) {
+            if (mStatus == Status.SEARCH) {
                 mSearchString = savedInstanceState.getString(SEARCH_TEXT);
             }
         }
@@ -130,13 +130,6 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
                         mSwipeLayout.setEnabled(false);
                         break;
                 }
-            //case R.id.item3:
-            //    Toast.makeText(this, "Tutti", Toast.LENGTH_SHORT).show();
-            //    mPreviousTotal = 0;
-            //    loadFilmList("", 1, false);
-            //    mSwipeLayout.setEnabled(true);
-            //    return true;
-
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -145,7 +138,7 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         Log.d(TAG, "onCreateOptionsMenu: ");
-        
+
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
 
@@ -158,8 +151,13 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
             @Override
             public boolean onMenuItemActionExpand(MenuItem item) {
                 Log.d(TAG, "onMenuItemActionExpand: ");
+                getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.colorPrimary)));
+                getSupportActionBar().setTitle("Movies");
+                Window window = getWindow();
+                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                window.setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark));
                 String text = mSearchString;
-
+                filterItem.setEnabled(false);
                 searchView.onActionViewCollapsed();
                 mSwipeLayout.setEnabled(false);
                 searchView.onActionViewExpanded();
@@ -176,6 +174,7 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
                 hideKeyboard(MainActivity.this);
                 mSwipeLayout.setEnabled(true);
                 mStatus = Status.POPULAR;
+                filterItem.setEnabled(true);
                 mPreviousTotal = 0;
                 loadFilmList(mSearchString, 1);
                 return true;
@@ -224,9 +223,7 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-
         Log.d(TAG, "onSaveInstanceState: ");
-
         outState.putSerializable(STATUS, mStatus);
         outState.putString(SEARCH_TEXT, mSearchString);
     }
@@ -356,7 +353,7 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
                     call = null;
             }
 
-            if(call != null) {
+            if (call != null) {
                 call.enqueue(new Callback<MoviesResponse>() {
                     @Override
                     public void onResponse(Call<MoviesResponse> call, Response<MoviesResponse> response) {
